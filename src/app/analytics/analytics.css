@@ -1,0 +1,210 @@
+.analytics-section {
+  width: 100%;
+  margin-top: 24px;
+  padding: 0 0 24px;
+  background: transparent;
+}
+
+.card-title {
+  margin: 0;
+  font-weight: 600;
+  color: #232A36;
+}
+
+.patient-dropdown {
+  width: 260px;
+}
+
+.vitals-card {
+  background: #fff;
+  border: 1px solid #E8ECF1;
+  border-radius: 16px;
+  padding: 28px 32px 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.vitals-card + .vitals-card {
+  margin-top: 24px;
+}
+
+.vitals-card-header {
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 20px;
+  line-height: 140%;
+}
+
+.card-subtitle,
+.risk-gauge-label,
+.risk-legend-range {
+  font-size: 14px;
+  color: #6B7A8D;
+}
+
+.card-subtitle {
+  margin: 4px 0 0;
+  line-height: 150%;
+}
+
+.vitals-chart {
+  height: 440px;
+}
+
+.alerts-chart {
+  height: 400px;
+}
+
+.lab-range-charts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lab-metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.lab-metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0 4px 2px;
+}
+
+.lab-metric-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #232A36;
+}
+
+.lab-metric-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #232A36;
+}
+
+.lab-metric-value.out-of-range {
+  color: #E65548;
+}
+
+.lab-range-chart {
+  height: 100px;
+}
+
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.charts-row .vitals-card {
+  margin-top: 0;
+}
+
+.category-chart {
+  height: 380px;
+}
+
+.risk-score-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 380px;
+  padding-top: 16px;
+}
+
+.risk-gauge-wrapper {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.risk-gauge {
+  width: 350px;
+  height: 200px;
+}
+
+.risk-gauge-value {
+  font-size: 40px;
+  font-weight: 600;
+  color: #C5A84E;
+  line-height: 1;
+}
+
+.risk-gauge-label {
+  margin-top: 4px;
+}
+
+.risk-legend {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 24px;
+  margin-top: 0;
+}
+
+.risk-legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.risk-legend-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.risk-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.risk-legend-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #232A36;
+}
+
+@media (max-width: 1270px) {
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 576px – 899px: card padding 16px */
+@media (min-width: 576px) and (max-width: 899px) {
+  .vitals-card {
+    padding: 16px;
+  }
+}
+
+/* Below 575px: 12px gaps */
+@media (max-width: 575px) {
+  .vitals-card {
+    padding: 12px;
+  }
+
+  .charts-row {
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .vitals-card + .vitals-card {
+    margin-top: 12px;
+  }
+}
+
+

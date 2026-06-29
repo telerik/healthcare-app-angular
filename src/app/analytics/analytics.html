@@ -1,0 +1,339 @@
+<section class="analytics-section" aria-label="Clinical Analytics">
+  <ng-template #analyticsActions>
+    <kendo-dropdownlist
+      [data]="patients"
+      textField="name"
+      valueField="id"
+      [(value)]="selectedPatient"
+      [valuePrimitive]="false"
+      class="patient-dropdown"
+      aria-label="Select patient"
+      rounded="full"
+      adaptiveMode="auto"
+    >
+      <ng-template kendoDropDownListValueTemplate let-dataItem>
+        {{ dataItem?.name }} ({{ dataItem?.id }})
+      </ng-template>
+    </kendo-dropdownlist>
+    <button
+      kendoButton
+      class="export-btn"
+      aria-label="Export analytics data"
+      rounded="full"
+      [svgIcon]="downloadIcon"
+      (click)="exportChart()"
+    >
+      Export
+    </button>
+  </ng-template>
+
+  <div class="vitals-card">
+    <div class="vitals-card-header">
+      <h2 class="card-title">Vitals Over Time</h2>
+      <p class="card-subtitle">
+        Multi-series tracking of blood pressure, heart rate, SpO2, and temperature
+      </p>
+    </div>
+
+    <kendo-chart
+      #vitalsChart
+      class="vitals-chart"
+      aria-label="Vitals over time chart showing systolic BP, diastolic BP, heart rate, SpO2, temperature, and pulse"
+    >
+      <kendo-chart-tooltip [shared]="false" format="{0}"></kendo-chart-tooltip>
+      <kendo-chart-category-axis>
+        <kendo-chart-category-axis-item
+          [categories]="categories"
+          [justified]="true"
+          [majorGridLines]="{ visible: false }"
+          [labels]="{
+            font: '13px Inter, sans-serif',
+            color: '#8E99AB',
+            margin: { top: 8 },
+            rotation: 270,
+          }"
+        >
+        </kendo-chart-category-axis-item>
+      </kendo-chart-category-axis>
+
+      <kendo-chart-value-axis>
+        <kendo-chart-value-axis-item
+          [min]="0"
+          [max]="35"
+          [majorGridLines]="{ color: '#F0F2F5', dashType: 'solid' }"
+          [labels]="{ font: '13px Inter, sans-serif', color: '#8E99AB' }"
+        >
+        </kendo-chart-value-axis-item>
+      </kendo-chart-value-axis>
+
+      <kendo-chart-series>
+        @for (series of seriesData; track series.name) {
+          <kendo-chart-series-item
+            type="line"
+            [style]="lineType"
+            [data]="series.data"
+            [name]="series.name"
+            [color]="series.color"
+            [markers]="{
+              visible: true,
+              type: 'circle',
+              size: 8,
+              background: '#fff',
+              border: { color: series.color, width: 2 },
+            }"
+          >
+          </kendo-chart-series-item>
+        }
+      </kendo-chart-series>
+
+      <kendo-chart-legend
+        position="bottom"
+        [labels]="{ font: '13px Inter, sans-serif', color: '#4A5666' }"
+        [item]="{ visual: legendItemVisual }"
+      >
+      </kendo-chart-legend>
+    </kendo-chart>
+  </div>
+
+  <!-- Alerts Over Time -->
+  <div class="vitals-card">
+    <div class="vitals-card-header">
+      <h2 class="card-title">Alerts Over Time</h2>
+      <p class="card-subtitle">Alert count trendy by severity level</p>
+    </div>
+
+    <kendo-chart
+      class="alerts-chart"
+      aria-label="Stacked bar chart showing alert counts by severity level over months"
+    >
+      <kendo-chart-tooltip [shared]="false" format="{0}"></kendo-chart-tooltip>
+      <kendo-chart-category-axis>
+        <kendo-chart-category-axis-item
+          [categories]="alertsCategories"
+          [majorGridLines]="{ visible: false }"
+          [labels]="{ font: '13px Inter, sans-serif', color: '#8E99AB', margin: { top: 8 } }"
+        ></kendo-chart-category-axis-item>
+      </kendo-chart-category-axis>
+      <kendo-chart-value-axis>
+        <kendo-chart-value-axis-item
+          [min]="0"
+          [max]="35"
+          [majorGridLines]="{ color: '#F0F2F5', dashType: 'solid' }"
+          [labels]="{ font: '13px Inter, sans-serif', color: '#8E99AB' }"
+        ></kendo-chart-value-axis-item>
+      </kendo-chart-value-axis>
+      <kendo-chart-series>
+        <kendo-chart-series-item
+          type="column"
+          [stack]="true"
+          [data]="alertsInfo"
+          name="Info"
+          color="#5B8FF9"
+          [gap]="1.5"
+        ></kendo-chart-series-item>
+        <kendo-chart-series-item
+          type="column"
+          [stack]="true"
+          [data]="alertsWarning"
+          name="Warning"
+          color="#F5C542"
+        ></kendo-chart-series-item>
+        <kendo-chart-series-item
+          type="column"
+          [stack]="true"
+          [data]="alertsCritical"
+          name="Critical"
+          color="#E65548"
+        ></kendo-chart-series-item>
+      </kendo-chart-series>
+      <kendo-chart-legend
+        position="bottom"
+        [labels]="{ font: '13px Inter, sans-serif', color: '#4A5666' }"
+        [item]="{ visual: legendItemVisual }"
+      ></kendo-chart-legend>
+    </kendo-chart>
+  </div>
+
+  <!-- Lab Results Range -->
+  <div class="vitals-card">
+    <div class="vitals-card-header">
+      <h2 class="card-title">Lab Results Range</h2>
+      <p class="card-subtitle">
+        Multi-metric range chart showing latest lab results against optimal ranges
+      </p>
+    </div>
+
+    <div class="lab-range-charts">
+      @for (metric of labMetrics; track metric.name) {
+        <div class="lab-metric-item">
+          <div class="lab-metric-header">
+            <span class="lab-metric-name">{{ metric.name }}</span>
+            <span
+              class="lab-metric-value"
+              [class.out-of-range]="metric.current < metric.minRef || metric.current > metric.maxRef"
+            >{{ metric.current }} {{ metric.unit }}</span>
+          </div>
+          <kendo-chart class="lab-range-chart" aria-label="Bullet chart for {{ metric.name }}">
+            <kendo-chart-tooltip>
+              <ng-template kendoChartSeriesTooltipTemplate let-point="point">
+                <strong>{{ metric.name }}</strong><br />
+                Current: {{ point.dataItem.current }} {{ metric.unit }}<br />
+                Avg (30d): {{ point.dataItem.average }} {{ metric.unit }}<br />
+                Target: {{ point.dataItem.target }} {{ metric.unit }}
+              </ng-template>
+            </kendo-chart-tooltip>
+            <kendo-chart-category-axis>
+              <kendo-chart-category-axis-item
+                [categories]="[metric.name]"
+                [visible]="false"
+              ></kendo-chart-category-axis-item>
+            </kendo-chart-category-axis>
+            <kendo-chart-value-axis>
+              <kendo-chart-value-axis-item
+                [min]="metric.min"
+                [max]="metric.max"
+                [majorUnit]="metric.majorUnit"
+                [majorGridLines]="{ visible: false }"
+                [labels]="{ font: '12px Inter, sans-serif', color: '#8E99AB' }"
+                [plotBands]="metric.plotBands"
+                [notes]="{
+                  data: [
+                    {
+                      value: metric.minRef,
+                      label: {
+                        text: 'MIN',
+                        font: '11px Inter, sans-serif',
+                        color: '#4A5666',
+                        position: 'outside',
+                      },
+                      line: { length: 25, color: '#64748B', width: 1 },
+                    },
+                    {
+                      value: metric.maxRef,
+                      label: {
+                        text: 'MAX',
+                        font: '11px Inter, sans-serif',
+                        color: '#4A5666',
+                        position: 'outside',
+                      },
+                      line: { length: 25, color: '#64748B', width: 1 },
+                    },
+                  ],
+                  position: 'top',
+                }"
+              ></kendo-chart-value-axis-item>
+            </kendo-chart-value-axis>
+            <kendo-chart-series>
+              <kendo-chart-series-item
+                type="bullet"
+                [data]="[{ current: metric.current, average: metric.average, target: metric.target }]"
+                field="current"
+                targetField="target"
+                color="#5B8FF9"
+                [gap]="2"
+                [border]="{ width: 0 }"
+                [target]="{ color: '#1E293B' }"
+              ></kendo-chart-series-item>
+            </kendo-chart-series>
+            <kendo-chart-legend [visible]="false"></kendo-chart-legend>
+          </kendo-chart>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <!-- Alerts by Category -->
+    <div class="vitals-card">
+      <div class="vitals-card-header">
+        <h2 class="card-title">Alerts by Category</h2>
+        <p class="card-subtitle">Distribution of alerts by clinical category</p>
+      </div>
+
+      <kendo-chart
+        class="category-chart"
+        aria-label="Donut chart showing alerts distribution by clinical category"
+      >
+        <kendo-chart-tooltip>
+          <ng-template kendoChartSeriesTooltipTemplate let-point="point">
+            {{ point.category }}: {{ point.value }}
+          </ng-template>
+        </kendo-chart-tooltip>
+        <kendo-chart-series>
+          <kendo-chart-series-item
+            type="donut"
+            [data]="alertsCategoryData"
+            field="value"
+            categoryField="category"
+            colorField="color"
+            [holeSize]="80"
+            [labels]="{
+              visible: true,
+              content: labelContent,
+              font: '13px Inter, sans-serif',
+              color: '#4A5666',
+              position: 'outsideEnd',
+              align: 'column',
+            }"
+          ></kendo-chart-series-item>
+        </kendo-chart-series>
+        <kendo-chart-legend
+          position="bottom"
+          [labels]="{ font: '13px Inter, sans-serif', color: '#4A5666' }"
+          [item]="{ visual: donutLegendItemVisual }"
+        ></kendo-chart-legend>
+      </kendo-chart>
+    </div>
+
+    <!-- Risk Score -->
+    <div class="vitals-card">
+      <div class="vitals-card-header">
+        <h2 class="card-title">Risk Score</h2>
+        <p class="card-subtitle">Patient health risk assessment</p>
+      </div>
+
+      <div class="risk-score-content">
+        <div class="risk-gauge-wrapper">
+          <kendo-arcgauge
+            [value]="riskScore"
+            [scale]="{
+              rangeSize: 20,
+              startAngle: 0,
+              endAngle: 180,
+              min: 0,
+              max: 100,
+              majorTicks: { visible: false },
+              minorTicks: { visible: false },
+              labels: { visible: false },
+              rangeLineCap: 'round',
+            }"
+            [colors]="[
+              { from: 0, to: 39, color: '#4CAF50' },
+              { from: 40, to: 69, color: '#C5A84E' },
+              { from: 70, to: 100, color: '#E65548' },
+            ]"
+            class="risk-gauge"
+          >
+            <ng-template kendoArcGaugeCenterTemplate>
+              <span class="risk-gauge-value">{{ riskScore }}%</span>
+              <br />
+              <span class="risk-gauge-label">Out of 100</span>
+            </ng-template>
+          </kendo-arcgauge>
+        </div>
+
+        <div class="risk-legend">
+          @for (level of riskLevels; track level.label) {
+            <div class="risk-legend-item">
+              <div class="risk-legend-left">
+                <span class="risk-legend-dot" [style.background-color]="level.color"></span>
+                <span class="risk-legend-label">{{ level.label }}</span>
+              </div>
+              <span class="risk-legend-range">{{ level.range }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

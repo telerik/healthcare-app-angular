@@ -1,0 +1,381 @@
+import { Component, signal, ViewEncapsulation, OnInit, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { PopupComponent } from '@progress/kendo-angular-popup';
+import { ComboBoxComponent } from '@progress/kendo-angular-dropdowns';
+import { NgOptimizedImage } from '@angular/common';
+import { FormsModule, NgForm } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink, RouterOutlet, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { KENDO_BUTTONS, SegmentedItemSettings } from '@progress/kendo-angular-buttons';
+import { KENDO_DIALOG } from '@progress/kendo-angular-dialog';
+import { KENDO_DROPDOWNS } from '@progress/kendo-angular-dropdowns';
+import { KENDO_ICONS } from '@progress/kendo-angular-icons';
+import { KENDO_INDICATORS } from '@progress/kendo-angular-indicators';
+import { KENDO_INPUTS } from '@progress/kendo-angular-inputs';
+import { KENDO_LABELS } from '@progress/kendo-angular-label';
+import { KENDO_LAYOUT } from '@progress/kendo-angular-layout';
+import { KENDO_NAVIGATION } from '@progress/kendo-angular-navigation';
+import { KENDO_POPUP } from '@progress/kendo-angular-popup';
+import { PageHeaderService } from './services/page-header.service';
+import { PatientsService } from './services/patients.service';
+import { Patient } from './data/patients.data';
+import {
+  bellIcon,
+  brightnessContrastIcon,
+  calendarIcon,
+  chartLineMarkersIcon,
+  eyeSlashIcon,
+  filterIcon,
+  homeIcon,
+  menuIcon,
+  searchIcon,
+  SVGIcon,
+  uploadIcon,
+  userIcon,
+} from '@progress/kendo-svg-icons';
+
+@Component({
+  selector: 'app-root',
+  encapsulation: ViewEncapsulation.None,
+  templateUrl: './app.html',
+  styleUrls: ['./app.css'],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    FormsModule,
+    CommonModule,
+    NgOptimizedImage,
+    KENDO_NAVIGATION,
+    KENDO_BUTTONS,
+    KENDO_DROPDOWNS,
+    KENDO_ICONS,
+    KENDO_INPUTS,
+    KENDO_INDICATORS,
+    KENDO_LAYOUT,
+    KENDO_DIALOG,
+    KENDO_LABELS,
+    KENDO_POPUP,
+  ],
+})
+export class App implements OnInit {
+  // Icons
+  public homeIcon: SVGIcon = homeIcon;
+  public calendarIcon: SVGIcon = calendarIcon;
+  public userIcon: SVGIcon = userIcon;
+  public chartIcon: SVGIcon = chartLineMarkersIcon;
+  public searchIcon: SVGIcon = searchIcon;
+  public filterIcon: SVGIcon = filterIcon;
+  public themeIcon: SVGIcon = brightnessContrastIcon;
+  public contrastIcon: SVGIcon = eyeSlashIcon;
+  public bellIcon: SVGIcon = bellIcon;
+  public githubIcon: SVGIcon = {
+    name: 'github',
+    viewBox: '0 0 24 24',
+    content: `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>`,
+  };
+  public currentYear = new Date().getFullYear();
+  public uploadIcon: SVGIcon = uploadIcon;
+  public menuIcon: SVGIcon = menuIcon;
+
+  // Navigation items for Segmented Control
+  private readonly fullNavItems: SegmentedItemSettings[] = [
+    { svgIcon: homeIcon, text: 'Home', title: 'Home' },
+    { svgIcon: calendarIcon, text: 'Schedule', title: 'Schedule' },
+    { svgIcon: userIcon, text: 'Patients', title: 'Patients' },
+    { svgIcon: chartLineMarkersIcon, text: 'Clinical Analytics', title: 'Clinical Analytics' },
+  ];
+
+  private readonly iconOnlyNavItems: SegmentedItemSettings[] = [
+    { svgIcon: homeIcon, title: 'Home' },
+    { svgIcon: calendarIcon, title: 'Schedule' },
+    { svgIcon: userIcon, title: 'Patients' },
+    { svgIcon: chartLineMarkersIcon, title: 'Clinical Analytics' },
+  ];
+
+  public navItems: SegmentedItemSettings[] = this.getNavItems();
+  public isNarrowNav = signal(window.innerWidth < 576);
+  public isCompact = signal(window.innerWidth <= 1440);
+  public searchExpanded = signal(false);
+  public isSmallLogo = signal(window.innerWidth < 900);
+  public dialogWidth = signal(this.getDialogWidth());
+  public dialogHeight = signal(this.getDialogHeight());
+
+  private getDialogWidth(): number {
+    return window.innerWidth < 1000 ? Math.min(600, window.innerWidth - 32) : 600;
+  }
+
+  private getDialogHeight(): number {
+    return window.innerWidth < 1000 ? Math.min(800, window.innerHeight - 32) : 800;
+  }
+
+  public navDropdownItems = [
+    { text: 'Home', svgIcon: homeIcon, route: '/' },
+    { text: 'Schedule', svgIcon: calendarIcon, route: '/schedule' },
+    { text: 'Patients', svgIcon: userIcon, route: '/patients' },
+    { text: 'Clinical Analytics', svgIcon: chartLineMarkersIcon, route: '/analytics' },
+  ];
+
+  private getNavItems(): SegmentedItemSettings[] {
+    return window.innerWidth <= 1440 ? this.iconOnlyNavItems : this.fullNavItems;
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.navItems = this.getNavItems();
+    this.isNarrowNav.set(window.innerWidth < 576);
+    this.isCompact.set(window.innerWidth <= 1440);
+    this.isSmallLogo.set(window.innerWidth < 900);
+    this.dialogWidth.set(this.getDialogWidth());
+    this.dialogHeight.set(this.getDialogHeight());
+    if (window.innerWidth > 1440) {
+      this.searchExpanded.set(false);
+    }
+  }
+
+  public selectedNavIndex = 0;
+  public customContrastIcon: SVGIcon = {
+    name: 'custom-contrast',
+    viewBox: '0 0 16 16',
+    content: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_1764_44065)">
+<path d="M6.00065 10.6667C8.57798 10.6667 10.6673 8.57734 10.6673 6.00001C10.6673 3.42268 8.57798 1.33334 6.00065 1.33334C3.42332 1.33334 1.33398 3.42268 1.33398 6.00001C1.33398 8.57734 3.42332 10.6667 6.00065 10.6667Z" stroke="#232A36" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10.0007 14.6667C12.578 14.6667 14.6673 12.5773 14.6673 10C14.6673 7.42268 12.578 5.33334 10.0007 5.33334C7.42332 5.33334 5.33398 7.42268 5.33398 10C5.33398 12.5773 7.42332 14.6667 10.0007 14.6667Z" stroke="#232A36" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_1764_44065">
+<rect width="16" height="16" fill="white"/>
+</clipPath>
+</defs>
+</svg>`,
+  };
+
+  // Search state
+  public searchValue = signal('');
+  public selectedPatient: Patient | null = null;
+  public patients: Patient[] = [];
+
+  // Opacity mode toggle
+  public opacityMode = signal(false);
+
+  // Profile dialog state
+  public profileDialogOpened = false;
+
+  // Notifications state
+  @ViewChild('notificationAnchor', { read: ElementRef }) notificationAnchor!: ElementRef;
+  @ViewChild('notificationsPopup') notificationsPopupRef?: PopupComponent;
+  @ViewChild('githubAnchor', { read: ElementRef }) githubAnchor!: ElementRef;
+  @ViewChild('githubPopup') githubPopupRef?: PopupComponent;
+  @ViewChild('searchCombobox') searchCombobox?: ComboBoxComponent;
+  public notificationsOpened = false;
+  public githubPopupOpened = false;
+  public notifications = [
+    {
+      id: 1,
+      title: 'Follow-up Reminder',
+      description: 'A follow-up consultation is recom...',
+      time: '5 min ago',
+      unread: true,
+    },
+    {
+      id: 2,
+      title: 'Extended Request',
+      description: "Based on Emma's current conditi...",
+      time: '35 min ago',
+      unread: true,
+    },
+    {
+      id: 3,
+      title: 'Medication Check',
+      description: 'Ensure patient is taking medications...',
+      time: '1 h ago',
+      unread: true,
+    },
+  ];
+
+  constructor(
+    public pageHeaderService: PageHeaderService,
+    private router: Router,
+    private patientsService: PatientsService,
+  ) {
+    // Set initial selected nav based on current route
+    this.updateSelectedNavFromRoute();
+    // Load patients data for combobox
+    this.patients = this.patientsService.getAllPatients();
+  }
+
+  ngOnInit(): void {
+    // Subscribe to router events to update navigation on route changes
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.updateSelectedNavFromRoute();
+      });
+  }
+
+  // Profile data for logged-in user (Dr. Carter) — session-persisted
+  public profileImageSrc = 'assets/profile.jpg';
+  public profileFullName = 'Emily Carter';
+  public profileEmail = 'drcarter@email.com';
+  public profilePhone = '+(555) 776-90-84';
+
+  // Staging values while dialog is open
+  public dialogImageSrc = 'assets/profile.jpg';
+  public dialogFullName = 'Emily Carter';
+  public dialogEmail = 'drcarter@email.com';
+  public dialogPhone = '+(555) 776-90-84';
+
+  public toggleOpacityMode(): void {
+    this.opacityMode.update((v) => !v);
+  }
+
+  // Handle navigation item selection
+  public onNavChange(index: number): void {
+    this.selectedNavIndex = index;
+    const routes = ['/', '/schedule', '/patients', '/analytics'];
+    this.router.navigate([routes[index]]);
+  }
+
+  public onNavDropdownSelect(item: { text: string; route: string }): void {
+    const routes = ['/', '/schedule', '/patients', '/analytics'];
+    const index = routes.indexOf(item.route);
+    if (index !== -1) this.selectedNavIndex = index;
+    this.router.navigate([item.route]);
+  }
+
+  // Update selected nav index based on current route
+  private updateSelectedNavFromRoute(): void {
+    const routes = ['/', '/schedule', '/patients', '/analytics'];
+    const currentRoute = this.router.url;
+    const index = routes.findIndex((route) =>
+      route === '/' ? currentRoute === '/' : currentRoute.startsWith(route),
+    );
+    if (index !== -1) {
+      this.selectedNavIndex = index;
+    }
+  }
+
+  // Handle patient selection from combobox
+  public onPatientSelect(value: Patient | null | undefined): void {
+    // With valuePrimitive=false, the ComboBox emits the full Patient object
+    if (value && typeof value === 'object' && value.id) {
+      console.log('Navigating to patient:', value);
+      this.selectedPatient = value;
+      // Simply navigate - Angular will handle route reuse properly
+      this.router.navigate(['/patients', value.id]);
+      this.searchExpanded.set(false);
+    } else if (value === null || value === undefined) {
+      // User cleared the search
+      this.selectedPatient = null;
+    }
+  }
+
+  public openSearch(): void {
+    this.searchExpanded.set(true);
+    setTimeout(() => this.searchCombobox?.focus());
+  }
+
+  public closeSearch(): void {
+    this.searchExpanded.set(false);
+  }
+
+  // Profile dialog methods
+  public openProfileDialog(): void {
+    // Load current persisted values into dialog staging area
+    this.dialogImageSrc = this.profileImageSrc;
+    this.dialogFullName = this.profileFullName;
+    this.dialogEmail = this.profileEmail;
+    this.dialogPhone = this.profilePhone;
+    this.profileDialogOpened = true;
+  }
+
+  public closeProfileDialog(): void {
+    this.profileDialogOpened = false;
+  }
+
+  public clearProfileForm(form: NgForm): void {
+    form.resetForm({ fullName: '', email: '', phone: '' });
+  }
+
+  public submitProfile(form: NgForm): void {
+    if (form.invalid) {
+      form.control.markAllAsTouched();
+      return;
+    }
+    // Persist dialog values to session state
+    this.profileImageSrc = this.dialogImageSrc;
+    this.profileFullName = this.dialogFullName;
+    this.profileEmail = this.dialogEmail;
+    this.profilePhone = this.dialogPhone;
+    this.closeProfileDialog();
+  }
+
+  public uploadImage(): void {
+    const fileInput = document.getElementById('profileFileInput') as HTMLInputElement;
+    fileInput?.click();
+  }
+
+  public onProfileFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.dialogImageSrc = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+    // Reset so the same file can be selected again
+    input.value = '';
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    if (this.notificationsOpened) {
+      this.closeNotifications();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node;
+
+    if (this.notificationsOpened) {
+      const isInsideAnchor = this.notificationAnchor?.nativeElement?.contains(target);
+      const isInsidePopup = this.notificationsPopupRef?.container?.nativeElement?.contains(target);
+      if (!isInsideAnchor && !isInsidePopup) {
+        this.closeNotifications();
+      }
+    }
+
+    if (this.githubPopupOpened) {
+      const isInsideAnchor = this.githubAnchor?.nativeElement?.contains(target);
+      const isInsidePopup = this.githubPopupRef?.container?.nativeElement?.contains(target);
+      if (!isInsideAnchor && !isInsidePopup) {
+        this.closeGithubPopup();
+      }
+    }
+  }
+
+  // Notification methods
+  public toggleNotifications(): void {
+    this.githubPopupOpened = false;
+    this.notificationsOpened = !this.notificationsOpened;
+  }
+
+  public closeNotifications(): void {
+    this.notificationsOpened = false;
+  }
+
+  public toggleGithubPopup(): void {
+    this.notificationsOpened = false;
+    this.githubPopupOpened = !this.githubPopupOpened;
+  }
+
+  public closeGithubPopup(): void {
+    this.githubPopupOpened = false;
+  }
+
+  public markAllAsRead(): void {
+    this.notifications = this.notifications.map((n) => ({ ...n, unread: false }));
+  }
+}
