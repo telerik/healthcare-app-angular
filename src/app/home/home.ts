@@ -1,4 +1,14 @@
-import { Component, ElementRef, OnInit, OnDestroy, ViewChild, ViewEncapsulation, HostListener, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ViewEncapsulation,
+  HostListener,
+  signal,
+  inject,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgTemplateOutlet } from '@angular/common';
 import { Router } from '@angular/router';
@@ -34,7 +44,14 @@ import {
   xIcon,
 } from '@progress/kendo-svg-icons';
 import { PATIENTS_DATA, PatientProfile } from '../data/patients.data';
-import { DAILY_ALERTS, HOME_PATIENTS, LAB_TESTS, DailyAlert, HomePatient, LabTest } from '../data/home.data';
+import {
+  DAILY_ALERTS,
+  HOME_PATIENTS,
+  LAB_TESTS,
+  DailyAlert,
+  HomePatient,
+  LabTest,
+} from '../data/home.data';
 import { MarkdownPipe } from '../pipes/markdown.pipe';
 import { AppointmentsService, GridAppointment } from '../services/appointments.service';
 import { PageHeaderService } from '../services/page-header.service';
@@ -172,7 +189,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Daily Alerts data
   public dailyAlerts: DailyAlert[] = [...DAILY_ALERTS];
 
-  public selectedAlert: any = null;
+  public selectedAlert: DailyAlert | null = null;
 
   // Reason for Visit data
   public reasonForVisit = {
@@ -266,11 +283,11 @@ Please take a moment to review James Carter's latest test results when you have 
 Thanks,
 Dr. Carter`;
 
-  constructor(
-    private pageHeaderService: PageHeaderService,
-    private router: Router,
-    private appointmentsService: AppointmentsService,
-  ) {
+  private pageHeaderService = inject(PageHeaderService);
+  private router = inject(Router);
+  private appointmentsService = inject(AppointmentsService);
+
+  constructor() {
     const date = new Date();
     const options: Intl.DateTimeFormatOptions = {
       weekday: 'long',
@@ -328,7 +345,12 @@ Dr. Carter`;
 
   public sendLabTestRequest(): void {
     const selectedTests = this.labTests.filter((test) => test.selected);
-    console.log('Sending lab test request for:', this.labTestPatient?.name, 'Tests:', selectedTests);
+    console.log(
+      'Sending lab test request for:',
+      this.labTestPatient?.name,
+      'Tests:',
+      selectedTests,
+    );
     // Here you would typically send via a service
     this.closeLabTestDialog();
   }
@@ -342,7 +364,7 @@ Dr. Carter`;
     );
   }
 
-  public toggleLabTest(test: any): void {
+  public toggleLabTest(test: LabTest): void {
     test.selected = !test.selected;
   }
 
@@ -368,7 +390,7 @@ Dr. Carter`;
   }
 
   // Alert dialog methods
-  public openAlertDialog(alert: any): void {
+  public openAlertDialog(alert: DailyAlert): void {
     this.selectedAlert = alert;
     this.alertDialogOpened = true;
   }
@@ -446,7 +468,7 @@ Free-text queries are not supported in this preview. In your production app, con
 
     // Handle different suggestions
     setTimeout(() => {
-      let responseText = '';
+      let responseText: string;
 
       if (suggestion.id === 1) {
         // "Summary for next patient" - return hardcoded value

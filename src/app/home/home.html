@@ -16,7 +16,7 @@
             </kendo-card-body>
             <kendo-card-footer>
               <button
-                kendoButton
+                kendoButtonasda
                 class="card-action-btn"
                 fillMode="solid"
                 themeColor="primary"
@@ -167,7 +167,14 @@
         }
 
         <!-- Reason for Visit Card -->
-        <div class="info-card" (click)="openReasonForVisitDialog()">
+        <div
+          class="info-card"
+          role="button"
+          tabindex="0"
+          (click)="openReasonForVisitDialog()"
+          (keyup.enter)="openReasonForVisitDialog()"
+          (keyup.space)="openReasonForVisitDialog()"
+        >
           <div class="info-card-icon blue-bg">
             <kendo-svgicon [icon]="clipboardIcon"></kendo-svgicon>
           </div>
@@ -184,7 +191,14 @@
         </div>
 
         <!-- Allergy Alert Card -->
-        <div class="info-card" (click)="openAllergyAlertDialog()">
+        <div
+          class="info-card"
+          role="button"
+          tabindex="0"
+          (click)="openAllergyAlertDialog()"
+          (keyup.enter)="openAllergyAlertDialog()"
+          (keyup.space)="openAllergyAlertDialog()"
+        >
           <div class="info-card-icon yellow-bg">
             <kendo-svgicon [icon]="pillIcon"></kendo-svgicon>
           </div>
@@ -210,7 +224,14 @@
       <!-- Daily Alerts List -->
       <div class="daily-alerts">
         @for (alert of dailyAlerts; track alert.id) {
-          <div class="alert-item" (click)="openAlertDialog(alert)">
+          <div
+            class="alert-item"
+            role="button"
+            tabindex="0"
+            (click)="openAlertDialog(alert)"
+            (keyup.enter)="openAlertDialog(alert)"
+            (keyup.space)="openAlertDialog(alert)"
+          >
             <div>
               <div class="alert-content">
                 <span class="alert-title">{{ alert.title }}</span>
@@ -273,16 +294,19 @@
 
     <kendo-dialog-actions layout="end">
       <button kendoButton (click)="closeClinicalNoteDialog()">Discard</button>
-      <button kendoButton themeColor="primary" (click)="saveClinicalNote()">
-        Save note
-      </button>
+      <button kendoButton themeColor="primary" (click)="saveClinicalNote()">Save note</button>
     </kendo-dialog-actions>
   </kendo-dialog>
 }
 
 <!-- Lab Test Dialog -->
 @if (labTestDialogOpened) {
-  <kendo-dialog [width]="dlgW(690)" [height]="dlgH(580)" (close)="closeLabTestDialog()" class="lab-test-dialog">
+  <kendo-dialog
+    [width]="dlgW(690)"
+    [height]="dlgH(580)"
+    (close)="closeLabTestDialog()"
+    class="lab-test-dialog"
+  >
     <kendo-dialog-titlebar>
       <div class="dialog-title">Request Lab Tests</div>
     </kendo-dialog-titlebar>
@@ -311,17 +335,22 @@
 
       <div class="form-field">
         <kendo-label text="Select Lab Tests" labelCssClass="field-label">
-          <kendo-textbox
-            [(ngModel)]="labTestSearchQuery"
-            placeholder="Search Lab Tests"
-          >
+          <kendo-textbox [(ngModel)]="labTestSearchQuery" placeholder="Search Lab Tests">
           </kendo-textbox>
         </kendo-label>
       </div>
 
       <div class="lab-tests-list">
         @for (test of filteredLabTests; track test.id) {
-          <div class="lab-test-item" [class.selected]="test.selected" (click)="toggleLabTest(test)">
+          <div
+            class="lab-test-item"
+            [class.selected]="test.selected"
+            role="button"
+            tabindex="0"
+            (click)="toggleLabTest(test)"
+            (keyup.enter)="toggleLabTest(test)"
+            (keyup.space)="toggleLabTest(test)"
+          >
             <kendo-checkbox #checkboxRef [(ngModel)]="test.selected" class="lab-test-checkbox">
             </kendo-checkbox>
             <kendo-label
@@ -337,9 +366,7 @@
 
     <kendo-dialog-actions layout="end">
       <button kendoButton (click)="closeLabTestDialog()">Discard</button>
-      <button kendoButton themeColor="primary" (click)="sendLabTestRequest()">
-        Send request
-      </button>
+      <button kendoButton themeColor="primary" (click)="sendLabTestRequest()">Send request</button>
     </kendo-dialog-actions>
   </kendo-dialog>
 }
@@ -359,21 +386,14 @@
     <div class="dialog-content">
       <div class="form-field">
         <kendo-label text="To" labelCssClass="field-label">
-          <kendo-textbox
-            [(ngModel)]="recipientEmail"
-            placeholder="Enter recipient email"
-          >
+          <kendo-textbox [(ngModel)]="recipientEmail" placeholder="Enter recipient email">
           </kendo-textbox>
         </kendo-label>
       </div>
 
       <div class="form-field">
         <kendo-label text="Subject" labelCssClass="field-label">
-          <kendo-textbox
-            [(ngModel)]="messageSubject"
-            placeholder="Enter subject"
-          >
-          </kendo-textbox>
+          <kendo-textbox [(ngModel)]="messageSubject" placeholder="Enter subject"> </kendo-textbox>
         </kendo-label>
       </div>
 
@@ -392,16 +412,19 @@
 
     <kendo-dialog-actions layout="end">
       <button kendoButton (click)="closeMessageNurseDialog()">Discard</button>
-      <button kendoButton themeColor="primary" (click)="sendMessage()">
-        Send message
-      </button>
+      <button kendoButton themeColor="primary" (click)="sendMessage()">Send message</button>
     </kendo-dialog-actions>
   </kendo-dialog>
 }
 
 <!-- Alert Details Dialog -->
 @if (alertDialogOpened && selectedAlert) {
-  <kendo-dialog [width]="dlgW(720)" [height]="dlgH(650)" (close)="closeAlertDialog()" class="alert-dialog">
+  <kendo-dialog
+    [width]="dlgW(720)"
+    [height]="dlgH(650)"
+    (close)="closeAlertDialog()"
+    class="alert-dialog"
+  >
     <kendo-dialog-titlebar>
       <div class="dialog-title">Clinical Alert Details</div>
     </kendo-dialog-titlebar>
@@ -468,7 +491,182 @@
 
     <kendo-dialog-actions layout="end">
       <button kendoButton (click)="closeAlertDialog()">Close</button>
-      <button kendoButton themeColor="primary" (click)="acknowledgeAlert()">
+      <button kendoButton themeColor="primary" (click)="acknowledgeAlert()">Acknowledge</button>
+    </kendo-dialog-actions>
+  </kendo-dialog>
+}
+
+<!-- Reason for Visit Dialog -->
+@if (reasonForVisitDialogOpened) {
+  <kendo-dialog
+    [width]="dlgW(740)"
+    [height]="dlgH(680)"
+    (close)="closeReasonForVisitDialog()"
+    class="reason-visit-dialog"
+  >
+    <kendo-dialog-titlebar>
+      <div class="dialog-title">Visit Details</div>
+    </kendo-dialog-titlebar>
+
+    <div class="dialog-content">
+      <!-- Patient & Appointment Info -->
+      <div class="alert-patient-info">
+        <h3 class="field-label">Patient & Appointment</h3>
+        <div class="patient-info-grid">
+          <div class="info-item">
+            <span class="info-label">Patient Name:</span>
+            <span class="info-value">{{ reasonForVisit.patient }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Patient ID:</span>
+            <span class="info-value">{{ reasonForVisit.patientId }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Appointment:</span>
+            <span class="info-value">{{ reasonForVisit.appointmentDate }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Visit Type:</span>
+            <span class="info-value">{{ reasonForVisit.visitType }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Primary Concern -->
+      <div class="alert-condition-section">
+        <h3 class="field-label">Primary Concern</h3>
+        <div class="condition-badge priority-medium">{{ reasonForVisit.primaryConcern }}</div>
+      </div>
+
+      <!-- Background -->
+      <div class="alert-details-section">
+        <h3 class="field-label">Background</h3>
+        <p class="details-text">{{ reasonForVisit.background }}</p>
+      </div>
+
+      <!-- Previous Visits -->
+      <div class="alert-recommendations-section">
+        <h3 class="field-label">Previous Visits</h3>
+        <ul class="recommendations-list">
+          @for (visit of reasonForVisit.previousVisits; track $index) {
+            <li class="recommendation-item">
+              <strong>{{ visit.date }}:</strong> {{ visit.description }}
+            </li>
+          }
+        </ul>
+      </div>
+
+      <!-- Visit Objectives -->
+      <div class="alert-recommendations-section">
+        <h3 class="field-label">Visit Objectives</h3>
+        <ul class="recommendations-list">
+          @for (objective of reasonForVisit.objectives; track $index) {
+            <li class="recommendation-item">{{ objective }}</li>
+          }
+        </ul>
+      </div>
+    </div>
+
+    <kendo-dialog-actions layout="end">
+      <button kendoButton (click)="closeReasonForVisitDialog()">Close</button>
+      <button kendoButton themeColor="primary" (click)="closeReasonForVisitDialog()">
+        Start Visit
+      </button>
+    </kendo-dialog-actions>
+  </kendo-dialog>
+}
+
+<!-- Allergy Alert Dialog -->
+@if (allergyAlertDialogOpened) {
+  <kendo-dialog
+    [width]="dlgW(740)"
+    [height]="dlgH(700)"
+    (close)="closeAllergyAlertDialog()"
+    class="allergy-dialog"
+  >
+    <kendo-dialog-titlebar>
+      <div class="dialog-title">⚠️ Critical Allergy Alert</div>
+    </kendo-dialog-titlebar>
+
+    <div class="dialog-content">
+      <!-- Patient & Allergen Info -->
+      <div class="alert-patient-info">
+        <h3 class="field-label">Patient & Allergen</h3>
+        <div class="patient-info-grid">
+          <div class="info-item">
+            <span class="info-label">Patient Name:</span>
+            <span class="info-value">{{ allergyAlert.patient }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Patient ID:</span>
+            <span class="info-value">{{ allergyAlert.patientId }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Allergen:</span>
+            <span class="info-value">{{ allergyAlert.allergen }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">First Reported:</span>
+            <span class="info-value">{{ allergyAlert.firstReported }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Severity & Reaction -->
+      <div class="alert-values-section">
+        <h3 class="field-label">Severity & Reaction Type</h3>
+        <div class="values-grid">
+          <div class="value-item">
+            <span class="value-label">Severity Level:</span>
+            <span class="value-number current">{{ allergyAlert.severity }}</span>
+          </div>
+          <div class="value-item">
+            <span class="value-label">Reaction Type:</span>
+            <span class="value-number current">{{ allergyAlert.reaction }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reported Symptoms -->
+      <div class="alert-recommendations-section">
+        <h3 class="field-label">Reported Symptoms</h3>
+        <ul class="recommendations-list">
+          @for (symptom of allergyAlert.symptoms; track $index) {
+            <li class="recommendation-item">{{ symptom }}</li>
+          }
+        </ul>
+      </div>
+
+      <!-- Cross-Reactivities -->
+      <div class="alert-recommendations-section">
+        <h3 class="field-label">Cross-Reactivities (Avoid)</h3>
+        <ul class="recommendations-list">
+          @for (cross of allergyAlert.crossReactivities; track $index) {
+            <li class="recommendation-item">{{ cross }}</li>
+          }
+        </ul>
+      </div>
+
+      <!-- Safe Alternatives -->
+      <div class="alert-recommendations-section">
+        <h3 class="field-label">Safe Alternatives</h3>
+        <ul class="recommendations-list">
+          @for (alt of allergyAlert.safeAlternatives; track $index) {
+            <li class="recommendation-item">{{ alt }}</li>
+          }
+        </ul>
+      </div>
+
+      <!-- Additional Notes -->
+      <div class="alert-details-section">
+        <h3 class="field-label">Additional Notes</h3>
+        <p class="details-text">{{ allergyAlert.notes }}</p>
+      </div>
+    </div>
+
+    <kendo-dialog-actions layout="end">
+      <button kendoButton (click)="closeAllergyAlertDialog()">Close</button>
+      <button kendoButton themeColor="primary" (click)="closeAllergyAlertDialog()">
         Acknowledge
       </button>
     </kendo-dialog-actions>
@@ -548,7 +746,9 @@
 
     <kendo-dialog-actions layout="end">
       <button kendoButton (click)="closeReasonForVisitDialog()">Close</button>
-      <button kendoButton themeColor="primary" (click)="closeReasonForVisitDialog()">Start Visit</button>
+      <button kendoButton themeColor="primary" (click)="closeReasonForVisitDialog()">
+        Start Visit
+      </button>
     </kendo-dialog-actions>
   </kendo-dialog>
 }
@@ -643,180 +843,9 @@
 
     <kendo-dialog-actions layout="end">
       <button kendoButton (click)="closeAllergyAlertDialog()">Close</button>
-      <button kendoButton themeColor="primary" (click)="closeAllergyAlertDialog()">Acknowledge</button>
-    </kendo-dialog-actions>
-  </kendo-dialog>
-}
-
-<!-- Reason for Visit Dialog -->
-@if (reasonForVisitDialogOpened) {
-  <kendo-dialog
-    [width]="dlgW(740)"
-    [height]="dlgH(680)"
-    (close)="closeReasonForVisitDialog()"
-    class="reason-visit-dialog"
-  >
-    <kendo-dialog-titlebar>
-      <div class="dialog-title">Visit Details</div>
-    </kendo-dialog-titlebar>
-
-    <div class="dialog-content">
-      <!-- Patient & Appointment Info -->
-      <div class="alert-patient-info">
-        <h3 class="field-label">Patient & Appointment</h3>
-        <div class="patient-info-grid">
-          <div class="info-item">
-            <span class="info-label">Patient Name:</span>
-            <span class="info-value">{{ reasonForVisit.patient }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Patient ID:</span>
-            <span class="info-value">{{ reasonForVisit.patientId }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Appointment:</span>
-            <span class="info-value">{{ reasonForVisit.appointmentDate }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Visit Type:</span>
-            <span class="info-value">{{ reasonForVisit.visitType }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Primary Concern -->
-      <div class="alert-condition-section">
-        <h3 class="field-label">Primary Concern</h3>
-        <div class="condition-badge priority-medium">{{ reasonForVisit.primaryConcern }}</div>
-      </div>
-
-      <!-- Background -->
-      <div class="alert-details-section">
-        <h3 class="field-label">Background</h3>
-        <p class="details-text">{{ reasonForVisit.background }}</p>
-      </div>
-
-      <!-- Previous Visits -->
-      <div class="alert-recommendations-section">
-        <h3 class="field-label">Previous Visits</h3>
-        <ul class="recommendations-list">
-          @for (visit of reasonForVisit.previousVisits; track $index) {
-            <li class="recommendation-item">
-              <strong>{{ visit.date }}:</strong> {{ visit.description }}
-            </li>
-          }
-        </ul>
-      </div>
-
-      <!-- Visit Objectives -->
-      <div class="alert-recommendations-section">
-        <h3 class="field-label">Visit Objectives</h3>
-        <ul class="recommendations-list">
-          @for (objective of reasonForVisit.objectives; track $index) {
-            <li class="recommendation-item">{{ objective }}</li>
-          }
-        </ul>
-      </div>
-    </div>
-
-    <kendo-dialog-actions layout="end">
-      <button kendoButton (click)="closeReasonForVisitDialog()">Close</button>
-      <button kendoButton themeColor="primary" (click)="closeReasonForVisitDialog()">Start Visit</button>
-    </kendo-dialog-actions>
-  </kendo-dialog>
-}
-
-<!-- Allergy Alert Dialog -->
-@if (allergyAlertDialogOpened) {
-  <kendo-dialog
-    [width]="dlgW(740)"
-    [height]="dlgH(700)"
-    (close)="closeAllergyAlertDialog()"
-    class="allergy-dialog"
-  >
-    <kendo-dialog-titlebar>
-      <div class="dialog-title">⚠️ Critical Allergy Alert</div>
-    </kendo-dialog-titlebar>
-
-    <div class="dialog-content">
-      <!-- Patient & Allergen Info -->
-      <div class="alert-patient-info">
-        <h3 class="field-label">Patient & Allergen</h3>
-        <div class="patient-info-grid">
-          <div class="info-item">
-            <span class="info-label">Patient Name:</span>
-            <span class="info-value">{{ allergyAlert.patient }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Patient ID:</span>
-            <span class="info-value">{{ allergyAlert.patientId }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Allergen:</span>
-            <span class="info-value">{{ allergyAlert.allergen }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">First Reported:</span>
-            <span class="info-value">{{ allergyAlert.firstReported }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Severity & Reaction -->
-      <div class="alert-values-section">
-        <h3 class="field-label">Severity & Reaction Type</h3>
-        <div class="values-grid">
-          <div class="value-item">
-            <span class="value-label">Severity Level:</span>
-            <span class="value-number current">{{ allergyAlert.severity }}</span>
-          </div>
-          <div class="value-item">
-            <span class="value-label">Reaction Type:</span>
-            <span class="value-number current">{{ allergyAlert.reaction }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Reported Symptoms -->
-      <div class="alert-recommendations-section">
-        <h3 class="field-label">Reported Symptoms</h3>
-        <ul class="recommendations-list">
-          @for (symptom of allergyAlert.symptoms; track $index) {
-            <li class="recommendation-item">{{ symptom }}</li>
-          }
-        </ul>
-      </div>
-
-      <!-- Cross-Reactivities -->
-      <div class="alert-recommendations-section">
-        <h3 class="field-label">Cross-Reactivities (Avoid)</h3>
-        <ul class="recommendations-list">
-          @for (cross of allergyAlert.crossReactivities; track $index) {
-            <li class="recommendation-item">{{ cross }}</li>
-          }
-        </ul>
-      </div>
-
-      <!-- Safe Alternatives -->
-      <div class="alert-recommendations-section">
-        <h3 class="field-label">Safe Alternatives</h3>
-        <ul class="recommendations-list">
-          @for (alt of allergyAlert.safeAlternatives; track $index) {
-            <li class="recommendation-item">{{ alt }}</li>
-          }
-        </ul>
-      </div>
-
-      <!-- Additional Notes -->
-      <div class="alert-details-section">
-        <h3 class="field-label">Additional Notes</h3>
-        <p class="details-text">{{ allergyAlert.notes }}</p>
-      </div>
-    </div>
-
-    <kendo-dialog-actions layout="end">
-      <button kendoButton (click)="closeAllergyAlertDialog()">Close</button>
-      <button kendoButton themeColor="primary" (click)="closeAllergyAlertDialog()">Acknowledge</button>
+      <button kendoButton themeColor="primary" (click)="closeAllergyAlertDialog()">
+        Acknowledge
+      </button>
     </kendo-dialog-actions>
   </kendo-dialog>
 }

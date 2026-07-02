@@ -81,7 +81,14 @@
       <kendo-card-body>
         <ul class="tasks-list">
           @for (task of filteredTasks; track task.id) {
-            <li class="task-item" (click)="openAddTaskDialog(task)">
+            <li
+              class="task-item"
+              role="button"
+              tabindex="0"
+              (click)="openAddTaskDialog(task)"
+              (keyup.enter)="openAddTaskDialog(task)"
+              (keyup.space)="openAddTaskDialog(task)"
+            >
               <button
                 class="task-checkbox"
                 [ngClass]="{ 'task-completed': task.completed }"
@@ -203,7 +210,7 @@
 
     <kendo-dialog-actions layout="end">
       <button kendoButton (click)="closeAddTaskDialog()">Discard</button>
-      <button kendoButton themeColor="primary" (click)="saveTask()" >
+      <button kendoButton themeColor="primary" (click)="saveTask()">
         {{ saveButtonText }}
       </button>
     </kendo-dialog-actions>

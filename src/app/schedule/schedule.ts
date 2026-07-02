@@ -1,7 +1,11 @@
-import { Component, ViewEncapsulation, OnInit, HostListener, signal } from '@angular/core';
+import { Component, ViewEncapsulation, OnInit, HostListener, signal, inject } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { KENDO_SCHEDULER, EventStyleArgs, EventClickEvent } from '@progress/kendo-angular-scheduler';
+import {
+  KENDO_SCHEDULER,
+  EventStyleArgs,
+  EventClickEvent,
+} from '@progress/kendo-angular-scheduler';
 import { KENDO_LAYOUT } from '@progress/kendo-angular-layout';
 import { ChipThemeColor, KENDO_BUTTONS } from '@progress/kendo-angular-buttons';
 import { KENDO_INPUTS } from '@progress/kendo-angular-inputs';
@@ -85,9 +89,9 @@ export class ScheduleComponent implements OnInit {
   public newTaskName = '';
   public newTaskPriority: 'High' | 'Medium' | 'Low' = 'Medium';
   public newTaskDescription = '';
-  public priorities: Array<'High' | 'Medium' | 'Low'> = ['High', 'Medium', 'Low'];
+  public priorities: ('High' | 'Medium' | 'Low')[] = ['High', 'Medium', 'Low'];
 
-  public eventClass = (_args: EventStyleArgs) => 'schedule-event';
+  public eventClass = () => 'schedule-event';
 
   public eventStyles = (args: EventStyleArgs) => {
     const base: Record<string, string> = {
@@ -113,7 +117,9 @@ export class ScheduleComponent implements OnInit {
 
   public tasks: DailyTask[] = [...INITIAL_TASKS];
 
-  constructor(private appointmentsService: AppointmentsService) {
+  private appointmentsService = inject(AppointmentsService);
+
+  constructor() {
     // Initialize selected date to the current real date.
     this.selectedDate = new Date();
   }

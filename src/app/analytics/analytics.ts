@@ -1,4 +1,13 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  OnDestroy,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+  ViewEncapsulation,
+  inject,
+} from '@angular/core';
 import { KENDO_BUTTONS } from '@progress/kendo-angular-buttons';
 import {
   ChartComponent,
@@ -29,7 +38,7 @@ import {
 } from '../data/analytics.data';
 import { PageHeaderService } from '../services/page-header.service';
 const { Rect: GeoRect, Size } = geometry;
-const { Circle, Path } = drawing;
+const { Circle } = drawing;
 
 @Component({
   selector: 'app-analytics',
@@ -40,13 +49,15 @@ const { Circle, Path } = drawing;
 })
 export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('vitalsChart') vitalsChart!: ChartComponent;
-  @ViewChild('analyticsActions') analyticsActions!: TemplateRef<any>;
+  @ViewChild('analyticsActions') analyticsActions!: TemplateRef<unknown>;
 
-  constructor(private pageHeaderService: PageHeaderService) {}
+  private pageHeaderService = inject(PageHeaderService);
 
   ngOnInit(): void {
     this.pageHeaderService.title.set('Clinical Analytics');
-    this.pageHeaderService.subtitle.set('Patient trends, vitals, lab results, and risk assessment overview');
+    this.pageHeaderService.subtitle.set(
+      'Patient trends, vitals, lab results, and risk assessment overview',
+    );
   }
 
   ngAfterViewInit(): void {
@@ -118,7 +129,7 @@ export class AnalyticsComponent implements OnInit, AfterViewInit, OnDestroy {
   // Alerts by Category data
   public alertsCategoryData: AlertCategoryItem[] = [...ALERTS_CATEGORY_DATA];
 
-  public labelContent = (e: any): string => e.category;
+  public labelContent = (e: { category: string }): string => e.category;
 
   public donutLegendItemVisual = (args: LegendItemVisualArgs): Group => {
     const group = new Group();

@@ -1,1 +1,2 @@
-npm run lint
+npx lint-staged
+ng test --watch=false
