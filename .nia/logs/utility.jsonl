@@ -1,0 +1,2 @@
+{"event_type":"config_change","field":"issue_id","timestamp":"2026-07-02T04:55:15.812632Z","old_value":null,"new_value":"1"}
+{"event_type":"utility","command":"config set-issue","timestamp":"2026-07-02T04:55:15.819671Z","parameters":{"issue_id":"1"},"success":true}
