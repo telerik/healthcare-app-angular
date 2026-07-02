@@ -1,4 +1,13 @@
-import { Component, ViewEncapsulation, OnInit, OnDestroy, AfterViewInit, ViewChild, TemplateRef } from '@angular/core';
+import {
+  Component,
+  ViewEncapsulation,
+  OnInit,
+  OnDestroy,
+  AfterViewInit,
+  ViewChild,
+  TemplateRef,
+  inject,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { KENDO_GRID, GridComponent, KENDO_GRID_EXCEL_EXPORT } from '@progress/kendo-angular-grid';
 import { ExcelExportData } from '@progress/kendo-angular-excel-export';
@@ -15,12 +24,7 @@ import {
   ChatSuggestion,
 } from '@progress/kendo-angular-conversational-ui';
 import { guid } from '@progress/kendo-angular-common';
-import {
-  eyeIcon,
-  downloadIcon,
-  sparklesIcon,
-  SVGIcon,
-} from '@progress/kendo-svg-icons';
+import { eyeIcon, downloadIcon, sparklesIcon, SVGIcon } from '@progress/kendo-svg-icons';
 import { Patient } from '../data/patients.data';
 import { PageHeaderService } from '../services/page-header.service';
 import { PatientsService } from '../services/patients.service';
@@ -47,7 +51,7 @@ import { SortDescriptor } from '@progress/kendo-data-query';
 })
 export class PatientsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(GridComponent) private grid!: GridComponent;
-  @ViewChild('patientsActions') patientsActions!: TemplateRef<any>;
+  @ViewChild('patientsActions') patientsActions!: TemplateRef<unknown>;
 
   public eyeIcon: SVGIcon = eyeIcon;
   public downloadIcon: SVGIcon = downloadIcon;
@@ -79,7 +83,7 @@ export class PatientsComponent implements OnInit, AfterViewInit, OnDestroy {
     {
       id: guid(),
       author: this.aiAssistant,
-      text: `👋 Hello! I'm your AI Assistant`
+      text: `👋 Hello! I'm your AI Assistant`,
     },
     {
       id: guid(),
@@ -95,15 +99,15 @@ export class PatientsComponent implements OnInit, AfterViewInit, OnDestroy {
     { id: 4, text: 'Show diagnoses overview' },
   ];
 
-  constructor(
-    private pageHeaderService: PageHeaderService,
-    private router: Router,
-    private patientsService: PatientsService
-  ) {}
+  private pageHeaderService = inject(PageHeaderService);
+  private router = inject(Router);
+  private patientsService = inject(PatientsService);
 
   ngOnInit(): void {
     this.pageHeaderService.title.set('Patients');
-    this.pageHeaderService.subtitle.set('Monitor patient trends, vitals, lab results, and risk levels in one place');
+    this.pageHeaderService.subtitle.set(
+      'Monitor patient trends, vitals, lab results, and risk levels in one place',
+    );
     this.patients = this.patientsService.getAllPatients();
   }
 
@@ -173,7 +177,7 @@ Free-text queries are not supported in this preview. In your production app, con
 
       if (suggestion.id === 1) {
         const wardCounts: Record<string, number> = {};
-        this.patients.forEach(p => {
+        this.patients.forEach((p) => {
           wardCounts[p.ward] = (wardCounts[p.ward] || 0) + 1;
         });
         const wardList = Object.entries(wardCounts)
@@ -188,16 +192,16 @@ ${wardList}
 
 Use the grid filters to view patients by a specific ward.`;
       } else if (suggestion.id === 2) {
-        const criticalPatients = this.patients.filter(p => p.status === 'Critical');
+        const criticalPatients = this.patients.filter((p) => p.status === 'Critical');
         responseText = `🚨 **Critical Patients** (${criticalPatients.length})
 
 ${criticalPatients.map((p, i) => `${i + 1}. **${p.name}** — ${p.diagnosis}, ${p.ward} (Age ${p.age})`).join('\n')}
 
 These patients require immediate attention. Click **View Profile** to review their vitals and lab results.`;
       } else if (suggestion.id === 3) {
-        const critical = this.patients.filter(p => p.status === 'Critical').length;
-        const monitoring = this.patients.filter(p => p.status === 'Monitoring').length;
-        const stable = this.patients.filter(p => p.status === 'Stable').length;
+        const critical = this.patients.filter((p) => p.status === 'Critical').length;
+        const monitoring = this.patients.filter((p) => p.status === 'Monitoring').length;
+        const stable = this.patients.filter((p) => p.status === 'Stable').length;
         responseText = `📊 **Patient Status Summary**
 
 | Status | Count |
@@ -210,12 +214,14 @@ These patients require immediate attention. Click **View Profile** to review the
 ${critical > 0 ? `⚠️ ${critical} patient${critical > 1 ? 's require' : ' requires'} urgent review.` : '✅ No critical patients at this time.'}`;
       } else if (suggestion.id === 4) {
         const diagnosisCounts: Record<string, number> = {};
-        this.patients.forEach(p => {
+        this.patients.forEach((p) => {
           diagnosisCounts[p.diagnosis] = (diagnosisCounts[p.diagnosis] || 0) + 1;
         });
         const diagnosisList = Object.entries(diagnosisCounts)
           .sort((a, b) => b[1] - a[1])
-          .map(([diagnosis, count]) => `• **${diagnosis}**: ${count} patient${count > 1 ? 's' : ''}`)
+          .map(
+            ([diagnosis, count]) => `• **${diagnosis}**: ${count} patient${count > 1 ? 's' : ''}`,
+          )
           .join('\n');
         responseText = `🩺 **Diagnoses Overview**
 

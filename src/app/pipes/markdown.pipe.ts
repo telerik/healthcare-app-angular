@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { inject, Pipe, PipeTransform } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { marked } from 'marked';
 
@@ -7,7 +7,9 @@ import { marked } from 'marked';
   standalone: true,
 })
 export class MarkdownPipe implements PipeTransform {
-  constructor(private sanitizer: DomSanitizer) {
+  private sanitizer = inject(DomSanitizer);
+
+  constructor() {
     // Configure marked options for better rendering
     marked.setOptions({
       breaks: true, // Convert \n to <br>

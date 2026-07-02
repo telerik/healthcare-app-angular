@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChipThemeColor, KENDO_BUTTONS } from '@progress/kendo-angular-buttons';
 import { EditorCssSettings, KENDO_EDITOR } from '@progress/kendo-angular-editor';
@@ -67,17 +67,15 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
     { text: 'Patient Profile', svgIcon: userIcon, title: 'Patient Profile' },
   ];
 
-  public patientId: number = 0;
+  public patientId = 0;
   public patient: PatientProfile | null = null;
   public labResults: LabResult[] = [];
   public labResultsSort: SortDescriptor[] = [{ field: 'testName', dir: 'asc' }];
 
-  constructor(
-    private pageHeaderService: PageHeaderService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private patientsService: PatientsService,
-  ) {}
+  private pageHeaderService = inject(PageHeaderService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private patientsService = inject(PatientsService);
 
   ngOnInit(): void {
     this.pageHeaderService.title.set('Patients');

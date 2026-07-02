@@ -1,4 +1,13 @@
-import { Component, signal, ViewEncapsulation, OnInit, ViewChild, ElementRef, HostListener } from '@angular/core';
+import {
+  Component,
+  signal,
+  ViewEncapsulation,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  HostListener,
+  inject,
+} from '@angular/core';
 import { PopupComponent } from '@progress/kendo-angular-popup';
 import { ComboBoxComponent } from '@progress/kendo-angular-dropdowns';
 import { NgOptimizedImage } from '@angular/common';
@@ -192,11 +201,11 @@ export class App implements OnInit {
     },
   ];
 
-  constructor(
-    public pageHeaderService: PageHeaderService,
-    private router: Router,
-    private patientsService: PatientsService,
-  ) {
+  public pageHeaderService = inject(PageHeaderService);
+  private router = inject(Router);
+  private patientsService = inject(PatientsService);
+
+  constructor() {
     // Set initial selected nav based on current route
     this.updateSelectedNavFromRoute();
     // Load patients data for combobox

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { PATIENTS_DATA, Patient, PatientProfile, LabResult } from '../data/patients.data';
+import { PATIENTS_DATA, Patient, PatientProfile } from '../data/patients.data';
 
 @Injectable({
   providedIn: 'root',
