@@ -81,7 +81,8 @@
   max-width: 42px;
   padding: 0 12px !important;
   justify-content: flex-start !important;
-  transition: max-width var(--kendo-duration-speedy, 300ms) var(--kendo-easing-standard, cubic-bezier(0.42, 0, 0.58, 1));
+  transition: max-width var(--kendo-duration-speedy, 300ms)
+    var(--kendo-easing-standard, cubic-bezier(0.42, 0, 0.58, 1));
 }
 
 .card-action-btn:hover {
@@ -100,7 +101,8 @@
   opacity: 0;
   overflow: hidden;
   display: inline-block;
-  transition: opacity var(--kendo-duration-swift, 250ms) var(--kendo-easing-decelerate, cubic-bezier(0, 0, 0.58, 1));
+  transition: opacity var(--kendo-duration-swift, 250ms)
+    var(--kendo-easing-decelerate, cubic-bezier(0, 0, 0.58, 1));
 }
 
 .card-action-btn:hover .card-action-text {
@@ -116,7 +118,9 @@
   opacity: 0.4;
   color: #6366fb;
   pointer-events: none;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
 }
 
 .action-card:hover .card-bg-icon {
@@ -330,8 +334,12 @@
   flex-shrink: 0;
 }
 
-.info-card-icon.blue-bg { background: #d2e2fb; }
-.info-card-icon.yellow-bg { background: #fff4d3; }
+.info-card-icon.blue-bg {
+  background: #d2e2fb;
+}
+.info-card-icon.yellow-bg {
+  background: #fff4d3;
+}
 
 .info-card-content {
   display: flex;
@@ -420,6 +428,24 @@
   margin: 0;
 }
 
+/* Case State Chip Styles */
+.alert-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.case-state-chip {
+  flex-shrink: 0;
+}
+
+.case-state-chip.k-chip {
+  height: 24px;
+  font-size: 12px;
+}
+
 .alert-time {
   font-size: 14px;
   line-height: 142%;
@@ -434,7 +460,6 @@
   line-height: 150%;
   margin: 0;
 }
-
 
 .dialog-content {
   padding: 16px;
@@ -533,7 +558,6 @@
 
 /* Alert Dialog Content */
 
-
 .patient-info-grid,
 .values-grid {
   display: grid;
@@ -579,8 +603,12 @@
   font-weight: 700;
 }
 
-.value-number.current { color: #dc2626; }
-.value-number.normal { color: #64748b; }
+.value-number.current {
+  color: #dc2626;
+}
+.value-number.normal {
+  color: #64748b;
+}
 
 .details-text {
   font-size: 16px;
@@ -666,7 +694,7 @@
   height: 32px;
 }
 
-.k-chat{
+.k-chat {
   border: none;
 }
 

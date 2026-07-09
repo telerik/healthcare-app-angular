@@ -45,14 +45,15 @@ import {
 } from '@progress/kendo-svg-icons';
 import { PATIENTS_DATA, PatientProfile } from '../data/patients.data';
 import {
-  DAILY_ALERTS,
   HOME_PATIENTS,
   LAB_TESTS,
-  DailyAlert,
+  DailyAlertWithState,
+  CaseState,
   HomePatient,
   LabTest,
 } from '../data/home.data';
 import { MarkdownPipe } from '../pipes/markdown.pipe';
+import { AlertsService } from '../services/alerts.service';
 import { AppointmentsService, GridAppointment } from '../services/appointments.service';
 import { PageHeaderService } from '../services/page-header.service';
 
@@ -110,6 +111,15 @@ export class HomeComponent implements OnInit, OnDestroy {
       Cancelled: 'error',
     };
     return colorMap[status] ?? 'base';
+  }
+
+  public getCaseStateColor(state: CaseState): ChipThemeColor {
+    const colorMap: Record<CaseState, ChipThemeColor> = {
+      Open: 'info',
+      'In Progress': 'warning',
+      Resolved: 'success',
+    };
+    return colorMap[state] ?? 'base';
   }
 
   public fileDataIcon: SVGIcon = {
@@ -187,9 +197,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   ];
 
   // Daily Alerts data
-  public dailyAlerts: DailyAlert[] = [...DAILY_ALERTS];
+  public dailyAlerts: DailyAlertWithState[] = [];
 
-  public selectedAlert: DailyAlert | null = null;
+  public selectedAlert: DailyAlertWithState | null = null;
 
   // Reason for Visit data
   public reasonForVisit = {
@@ -286,6 +296,7 @@ Dr. Carter`;
   private pageHeaderService = inject(PageHeaderService);
   private router = inject(Router);
   private appointmentsService = inject(AppointmentsService);
+  private alertsService = inject(AlertsService);
 
   constructor() {
     const date = new Date();
@@ -305,6 +316,9 @@ Dr. Carter`;
 
     // Set next patient to Isabella Rossi (id: 3)
     this.nextPatient = PATIENTS_DATA.find((p) => p.id === 3) || null;
+
+    // Initialize alerts from service
+    this.dailyAlerts = this.alertsService.alerts();
   }
 
   ngOnDestroy(): void {
@@ -390,7 +404,7 @@ Dr. Carter`;
   }
 
   // Alert dialog methods
-  public openAlertDialog(alert: DailyAlert): void {
+  public openAlertDialog(alert: DailyAlertWithState): void {
     this.selectedAlert = alert;
     this.alertDialogOpened = true;
   }
