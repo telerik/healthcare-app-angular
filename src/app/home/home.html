@@ -219,11 +219,51 @@
       <hr />
 
       <!-- Daily Alerts Header -->
-      <h3 class="section-subtitle">Daily Alerts</h3>
+      <div class="daily-alerts-header">
+        <h3 class="section-subtitle">Daily Alerts</h3>
+        <kendo-buttongroup selection="single" class="alert-filter-group">
+          <button
+            kendoButton
+            [toggleable]="true"
+            [selected]="alertFilter === 'All'"
+            (selectedChange)="onFilterChange('All', $event)"
+            size="small"
+          >
+            All
+          </button>
+          <button
+            kendoButton
+            [toggleable]="true"
+            [selected]="alertFilter === 'Open'"
+            (selectedChange)="onFilterChange('Open', $event)"
+            size="small"
+          >
+            Open
+          </button>
+          <button
+            kendoButton
+            [toggleable]="true"
+            [selected]="alertFilter === 'In Progress'"
+            (selectedChange)="onFilterChange('In Progress', $event)"
+            size="small"
+          >
+            In Progress
+          </button>
+          <button
+            kendoButton
+            [toggleable]="true"
+            [selected]="alertFilter === 'Resolved'"
+            (selectedChange)="onFilterChange('Resolved', $event)"
+            size="small"
+          >
+            Resolved
+          </button>
+        </kendo-buttongroup>
+      </div>
 
       <!-- Daily Alerts List -->
       <div class="daily-alerts">
-        @for (alert of dailyAlerts; track alert.id) {
+        @for (alert of filteredAlerts; track alert.id) {
           <div
             class="alert-item"
             role="button"
@@ -254,6 +294,11 @@
                 </div>
               </div>
             </div>
+          </div>
+        }
+        @if (filteredAlerts.length === 0) {
+          <div class="daily-alerts-empty">
+            No {{ alertFilter === 'All' ? '' : alertFilter }} alerts to display
           </div>
         }
       </div>
