@@ -1,0 +1,32 @@
+schema_version = "1.0.0"
+
+[project]
+name = "healthcare-app-angular"
+description = "Kendo UI for Angular sample application"
+language = "TypeScript"
+framework = "Angular"
+testing_framework = "vitest"
+package_manager = "npm"
+
+# Uncomment and configure for monorepo
+# [monorepo]
+# enabled = true
+#
+# [[monorepo.services]]
+# name = "service-a"
+# path = "services/service-a"
+
+# Commit behavior configuration
+#
+# Controls how nia handles git commits during code generation tasks.
+#
+# Options:
+#   - "enabled" (default): Include basic commit instructions in prompts
+#   - "tagged": Include commit instructions with nia co-author attribution
+#   - "disabled": Do not include any commit instructions (you handle commits manually)
+#
+# Note: This is a global override. To configure commit behavior per command,
+#       use the agents.toml file (see comments in that file for examples).
+#
+# [commit]
+# behavior = "enabled"

@@ -1,0 +1,142 @@
+# Nia toolchain configuration
+# This file tells AI agents what tools are available and how to access them
+#
+# To switch access methods for a tool:
+#   1. Comment out the current 'description' field (add # prefix to each line)
+#   2. Uncomment your preferred method's description block
+#   3. Update the 'method' field to match the new method
+schema_version = "1.0.0"
+
+# Issue tracker configuration
+[issue_tracker]
+name = "github_issues"
+type = "built-in"
+method = "cli"  # Options: "cli", "mcp", "api"
+description = """
+GitHub Issues for task and bug tracking.
+Target repository: telerik/healthcare-app-angular
+Access via 'gh issue' CLI commands with --repo telerik/healthcare-app-angular.
+Common operations:
+- List issues: gh issue list --repo telerik/healthcare-app-angular
+- View issue: gh issue view {{issue_id}} --repo telerik/healthcare-app-angular
+- Create issue: gh issue create --repo telerik/healthcare-app-angular --title "..." --body "..."
+"""
+
+# [MCP Method]:
+# description = """
+# GitHub Issues for task and bug tracking.
+# Access via GitHub MCP Server.
+# The MCP server provides tools for listing, viewing, and managing issues.
+# All authentication is handled by the MCP server configuration.
+# """
+
+# [API Method]:
+# description = """
+# GitHub Issues for task and bug tracking.
+# Access via GitHub REST API.
+#
+# Authentication: API token required
+# - Environment variable: NIA_ISSUE_TOKEN
+# - Scope: Read and write access to repository issues
+# - Management: User-managed; set externally before running Nia
+# - Security: Nia does not inject tokens into logs, traces, or prompts
+#
+# The Coding Agent will read this token dynamically when making API calls.
+#
+# Common operations:
+# - List issues: GET /repos/{owner}/{repo}/issues
+# - View issue: GET /repos/{owner}/{repo}/issues/{{issue_id}}
+# - Create issue: POST /repos/{owner}/{repo}/issues
+# - Update issue: PATCH /repos/{owner}/{repo}/issues/{{issue_id}}
+# """
+
+# Ticket tracker configuration
+[ticket_tracker]
+name = "github_issues"
+type = "built-in"
+method = "cli"  # Options: "cli", "mcp", "api"
+description = """
+GitHub Issues for RFA ticket tracking (development-focused).
+Note: For customer-facing tickets, consider using a dedicated support platform.
+Target repository: telerik/healthcare-app-angular
+Access via 'gh issue' CLI commands with --repo telerik/healthcare-app-angular.
+Common operations:
+- List tickets: gh issue list --repo telerik/healthcare-app-angular
+- View ticket: gh issue view {{ticket_id}} --repo telerik/healthcare-app-angular
+- Create ticket: gh issue create --repo telerik/healthcare-app-angular --title "..." --body "..."
+"""
+
+# [MCP Method]:
+# description = """
+# GitHub Issues for RFA ticket tracking (development-focused).
+# Note: For customer-facing tickets, consider using a dedicated support platform.
+# Access via GitHub MCP Server.
+# The MCP server provides tools for listing, viewing, and managing issues.
+# All authentication is handled by the MCP server configuration.
+# """
+
+# [API Method]:
+# description = """
+# GitHub Issues for RFA ticket tracking (development-focused).
+# Note: For customer-facing tickets, consider using a dedicated support platform.
+# Access via GitHub REST API.
+#
+# Authentication: API token required
+# - Environment variable: NIA_TICKET_TOKEN
+# - Scope: Read and write access to repository issues
+# - Management: User-managed; set externally before running Nia
+# - Security: Nia does not inject tokens into logs, traces, or prompts
+#
+# The Coding Agent will read this token dynamically when making API calls.
+#
+# Common operations:
+# - List tickets: GET /repos/{owner}/{repo}/issues
+# - View ticket: GET /repos/{owner}/{repo}/issues/{{ticket_id}}
+# - Create ticket: POST /repos/{owner}/{repo}/issues
+# - Update ticket: PATCH /repos/{owner}/{repo}/issues/{{ticket_id}}
+# """
+
+# Code platform configuration
+[code_platform]
+name = "github"
+type = "built-in"
+method = "cli"  # Options: "cli", "mcp", "api"
+description = """
+GitHub for code hosting and collaboration.
+Access via 'gh' CLI commands.
+Common operations:
+- Create PR: gh pr create --title "..." --body "..."
+- View PR: gh pr view {{pr_id}}
+- Review PR: gh pr review {{pr_id}}
+- Merge PR: gh pr merge {{pr_id}}
+"""
+
+# [MCP Method]:
+# description = """
+# GitHub for code hosting and collaboration.
+# Access via GitHub MCP Server.
+# The MCP server provides comprehensive tools for repository operations including pull requests, code reviews, branches, and commits.
+# All authentication is handled by the MCP server configuration.
+# """
+
+# [API Method]:
+# description = """
+# GitHub for code hosting and collaboration.
+# Access via GitHub REST API.
+#
+# Authentication: API token required
+# - Environment variable: NIA_CODE_TOKEN
+# - Scope: Read and write access to repositories, pull requests, and code
+# - Management: User-managed; set externally before running Nia
+# - Security: Nia does not inject tokens into logs, traces, or prompts
+#
+# The Coding Agent will read this token dynamically when making API calls.
+#
+# Common operations:
+# - List PRs: GET /repos/{owner}/{repo}/pulls
+# - View PR: GET /repos/{owner}/{repo}/pulls/{{pr_id}}
+# - Create PR: POST /repos/{owner}/{repo}/pulls
+# - Merge PR: PUT /repos/{owner}/{repo}/pulls/{{pr_id}}/merge
+# - List commits: GET /repos/{owner}/{repo}/commits
+# """
+

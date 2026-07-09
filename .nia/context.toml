@@ -1,0 +1,7 @@
+issue_id = "2"
+
+[agent_sessions.copilot]
+backlog = { session_id = "unknown", session_name = "healthcare-app-angular-backlog-backlog" }
+issue = { session_id = "unknown", session_name = "healthcare-app-angular-issue-job_2" }
+issue_plan = { session_id = "unknown", session_name = "healthcare-app-angular-issue_plan-job_2" }
+code = { session_id = "unknown", session_name = "healthcare-app-angular-code-job_2" }

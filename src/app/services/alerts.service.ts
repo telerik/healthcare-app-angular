@@ -92,6 +92,10 @@ export class AlertsService {
    */
   public resetAllStates(): void {
     this.storedStates.set({});
-    localStorage.removeItem(STORAGE_KEY);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (error) {
+      console.warn('Failed to remove alert states from localStorage:', error);
+    }
   }
 }
