@@ -497,6 +497,42 @@
           }
         </ul>
       </div>
+
+      <!-- Case State -->
+      <div class="case-state-section">
+        <h3 class="field-label">Case State</h3>
+        <div class="case-state-controls">
+          <kendo-buttongroup selection="single">
+            <button
+              kendoButton
+              [toggleable]="true"
+              [selected]="selectedAlert.caseState === 'Open'"
+              (selectedChange)="changeCaseState('Open', $event)"
+              [themeColor]="selectedAlert.caseState === 'Open' ? 'info' : 'base'"
+            >
+              Open
+            </button>
+            <button
+              kendoButton
+              [toggleable]="true"
+              [selected]="selectedAlert.caseState === 'In Progress'"
+              (selectedChange)="changeCaseState('In Progress', $event)"
+              [themeColor]="selectedAlert.caseState === 'In Progress' ? 'warning' : 'base'"
+            >
+              In Progress
+            </button>
+            <button
+              kendoButton
+              [toggleable]="true"
+              [selected]="selectedAlert.caseState === 'Resolved'"
+              (selectedChange)="changeCaseState('Resolved', $event)"
+              [themeColor]="selectedAlert.caseState === 'Resolved' ? 'success' : 'base'"
+            >
+              Resolved
+            </button>
+          </kendo-buttongroup>
+        </div>
+      </div>
     </div>
 
     <kendo-dialog-actions layout="end">
