@@ -234,7 +234,17 @@
           >
             <div>
               <div class="alert-content">
-                <span class="alert-title">{{ alert.title }}</span>
+                <div class="alert-title-row">
+                  <span class="alert-title">{{ alert.title }}</span>
+                  <kendo-chip
+                    class="case-state-chip"
+                    [label]="alert.caseState"
+                    [themeColor]="getCaseStateColor(alert.caseState)"
+                    [removable]="false"
+                    size="small"
+                    rounded="full"
+                  ></kendo-chip>
+                </div>
                 <div class="alert-bottom">
                   <span class="alert-time">{{ alert.time }}</span>
                   <span class="alert-link">
