@@ -193,9 +193,12 @@
 }
 
 .next-patient-section .section-subtitle {
-  padding: 20px 20px 10px;
   font-size: 24px;
   margin: 0;
+}
+
+.next-patient-section > .k-card-body > .section-subtitle {
+  padding: 20px 20px 10px;
 }
 
 .next-patient-section hr {
@@ -462,6 +465,38 @@
 
 .case-state-controls .k-button {
   min-width: 100px;
+}
+
+/* Daily Alerts Filter */
+.daily-alerts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 20px 10px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.daily-alerts-header .section-subtitle {
+  padding: 0;
+  margin: 0;
+}
+
+.alert-filter-group {
+  flex-shrink: 0;
+}
+
+.alert-filter-group .k-button {
+  font-size: 12px;
+  padding: 4px 12px;
+}
+
+/* Empty state when no alerts match filter */
+.daily-alerts-empty {
+  padding: 20px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
 }
 
 .alert-time {

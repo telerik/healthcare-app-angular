@@ -198,6 +198,14 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   // Daily Alerts data
   public dailyAlerts: DailyAlertWithState[] = [];
+  public alertFilter: CaseState | 'All' = 'All';
+
+  public get filteredAlerts(): DailyAlertWithState[] {
+    if (this.alertFilter === 'All') {
+      return this.dailyAlerts;
+    }
+    return this.dailyAlerts.filter((alert) => alert.caseState === this.alertFilter);
+  }
 
   public selectedAlert: DailyAlertWithState | null = null;
 
@@ -439,6 +447,12 @@ Dr. Carter`;
 
     // Refresh the alerts list
     this.dailyAlerts = this.alertsService.alerts();
+  }
+
+  public onFilterChange(filter: CaseState | 'All', selected: boolean): void {
+    if (selected) {
+      this.alertFilter = filter;
+    }
   }
 
   // Reason for Visit dialog methods
