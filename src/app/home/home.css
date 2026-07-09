@@ -446,6 +446,24 @@
   font-size: 12px;
 }
 
+/* Case State Controls in Dialog */
+.case-state-section {
+  margin-top: 8px;
+}
+
+.case-state-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.case-state-controls .k-button-group {
+  flex-wrap: wrap;
+}
+
+.case-state-controls .k-button {
+  min-width: 100px;
+}
+
 .alert-time {
   font-size: 14px;
   line-height: 142%;

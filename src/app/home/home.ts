@@ -414,9 +414,31 @@ Dr. Carter`;
   }
 
   public acknowledgeAlert(): void {
+    if (this.selectedAlert && this.selectedAlert.caseState === 'Open') {
+      // Acknowledge sets state to In Progress
+      this.alertsService.setCaseState(this.selectedAlert.id, 'In Progress');
+      this.dailyAlerts = this.alertsService.alerts();
+    }
     console.log('Alert acknowledged:', this.selectedAlert);
-    // Here you would typically update the alert status via a service
     this.closeAlertDialog();
+  }
+
+  public changeCaseState(state: CaseState, selected: boolean): void {
+    if (!selected || !this.selectedAlert) {
+      return;
+    }
+
+    // Update via service
+    this.alertsService.setCaseState(this.selectedAlert.id, state);
+
+    // Update local state for immediate UI feedback
+    this.selectedAlert = {
+      ...this.selectedAlert,
+      caseState: state,
+    };
+
+    // Refresh the alerts list
+    this.dailyAlerts = this.alertsService.alerts();
   }
 
   // Reason for Visit dialog methods
