@@ -42,3 +42,20 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Dev container local secrets (copied from the host, never commit)
+.devcontainer/.npmrc
+
+# Nia CLI — local state, caches, logs and machine-specific config (do NOT commit).
+# Committed Nia config (.nia/config/project.toml, agents.toml, toolchain.toml) is kept tracked.
+.nia/context.toml
+.nia/.context.lock
+.nia/cache/
+.nia/logs/
+.nia/work/
+.nia/config/opensearch.toml
+.nia/config/telemetry.toml
+.heartbeat
+sessions.toml
+.workflow.lock
+.sessions.lock
