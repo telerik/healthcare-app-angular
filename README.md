@@ -28,21 +28,21 @@
 
 ## Components Used
 
-| Component | Docs |
-|-----------|------|
+| Component  | Docs                                                                                     |
+| ---------- | ---------------------------------------------------------------------------------------- |
 | Breadcrumb | [Breadcrumb](https://www.telerik.com/kendo-angular-ui/components/navigation/breadcrumb/) |
-| Buttons | [Buttons](https://www.telerik.com/kendo-angular-ui/components/buttons/button/) |
-| Dialog | [Dialog](https://www.telerik.com/kendo-angular-ui/components/dialog/) |
-| DropDowns | [DropDowns](https://www.telerik.com/kendo-angular-ui/components/dropdowns/) |
-| Editor | [Editor](https://www.telerik.com/kendo-angular-ui/components/editor/) |
-| Gauges | [Gauges](https://www.telerik.com/kendo-angular-ui/components/gauges/) |
-| Grid | [Grid Component](https://www.telerik.com/kendo-angular-ui/components/grid/) |
-| Icons | [Icons](https://www.telerik.com/kendo-angular-ui/components/icons/icon/) |
-| Indicators | [Indicators](https://www.telerik.com/kendo-angular-ui/components/indicators/) |
-| Inputs | [Inputs](https://www.telerik.com/kendo-angular-ui/components/inputs/) |
-| Layout | [Layout](https://www.telerik.com/kendo-angular-ui/components/layout/) |
-| Scheduler | [Scheduler](https://www.telerik.com/kendo-angular-ui/components/scheduler/) |
-| Toolbar | [Toolbar](https://www.telerik.com/kendo-angular-ui/components/toolbar/) |
+| Buttons    | [Buttons](https://www.telerik.com/kendo-angular-ui/components/buttons/button/)           |
+| Dialog     | [Dialog](https://www.telerik.com/kendo-angular-ui/components/dialog/)                    |
+| DropDowns  | [DropDowns](https://www.telerik.com/kendo-angular-ui/components/dropdowns/)              |
+| Editor     | [Editor](https://www.telerik.com/kendo-angular-ui/components/editor/)                    |
+| Gauges     | [Gauges](https://www.telerik.com/kendo-angular-ui/components/gauges/)                    |
+| Grid       | [Grid Component](https://www.telerik.com/kendo-angular-ui/components/grid/)              |
+| Icons      | [Icons](https://www.telerik.com/kendo-angular-ui/components/icons/icon/)                 |
+| Indicators | [Indicators](https://www.telerik.com/kendo-angular-ui/components/indicators/)            |
+| Inputs     | [Inputs](https://www.telerik.com/kendo-angular-ui/components/inputs/)                    |
+| Layout     | [Layout](https://www.telerik.com/kendo-angular-ui/components/layout/)                    |
+| Scheduler  | [Scheduler](https://www.telerik.com/kendo-angular-ui/components/scheduler/)              |
+| Toolbar    | [Toolbar](https://www.telerik.com/kendo-angular-ui/components/toolbar/)                  |
 
 ---
 
@@ -77,3 +77,92 @@ ng build
 
 Build artifacts are stored in the `dist/` directory.
 
+---
+
+## Dev Container — Get Started Fast with the Nia CLI
+
+This repository ships a [Dev Container](.devcontainer) that provisions a ready-to-use
+environment for both Angular development and AI-assisted workflows. It installs Node.js,
+the GitHub CLI, three AI coding agents, and the **[Nia CLI](https://github.com/telerik/project-nia)**,
+then installs the project's dependencies — so you can start coding (and running Nia) within minutes.
+
+### What's included
+
+| Component                          | Details                                                                                                                                     |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Node.js 24 + npm**               | Runs the Angular app and the npm-based agents                                                                                               |
+| **GitHub CLI (`gh`)**              | Used by Nia workflows and for authentication                                                                                                |
+| **GitHub Copilot CLI** (`copilot`) | AI coding agent (installed via npm)                                                                                                         |
+| **OpenCode** (`opencode`)          | AI coding agent (installed via npm)                                                                                                         |
+| **Claude Code** (`claude`)         | AI coding agent (installed via npm)                                                                                                         |
+| **Nia CLI** (`nia`)                | Installed from the public `telerik/project-nia` repo — latest GitHub release, falling back to the latest pre-release; OS/arch auto-detected |
+| **Angular dependencies**           | `npm install` runs automatically on create                                                                                                  |
+| **Port 4200**                      | Forwarded for `ng serve`                                                                                                                    |
+
+### Prerequisites
+
+- [Docker](https://www.docker.com/) running locally
+- One of:
+  - [VS Code](https://code.visualstudio.com/) + the **Dev Containers** extension (`ms-vscode-remote.remote-containers`), or
+  - the [Dev Containers CLI](https://github.com/devcontainers/cli) (`npm install -g @devcontainers/cli`)
+
+### Open the container
+
+**VS Code:** open the folder, then run **Dev Containers: Reopen in Container** from the Command Palette (`Cmd/Ctrl+Shift+P`).
+
+**CLI:**
+
+```bash
+devcontainer up --workspace-folder .
+devcontainer exec --workspace-folder . bash
+```
+
+On first create, the container runs [`.devcontainer/setup.sh`](.devcontainer/setup.sh),
+which installs the agents, installs the Nia CLI, runs `npm install`, and prints a version
+summary plus the manual next steps below.
+
+### Finalize your setup (manual, one-time)
+
+Authentication is intentionally left to you (credentials are user/org-specific):
+
+```bash
+# 1. Authenticate the GitHub CLI (used by Nia workflows)
+gh auth login
+
+# 2. Authenticate the AI coding agents you plan to use
+copilot                 # GitHub Copilot CLI — sign in when prompted
+claude                  # Claude Code — set ANTHROPIC_API_KEY or sign in
+opencode auth login
+
+# 3. Provide Nia / agent credentials (replace with your onboarding values)
+# export NIA_API_KEY="<your-nia-api-key>"
+# export ANTHROPIC_API_KEY="<your-anthropic-api-key>"
+```
+
+### Start using the Nia CLI
+
+```bash
+nia --version           # confirm the CLI is installed
+nia --help              # explore available commands
+nia learn               # guided, hands-on onboarding tutorials
+```
+
+Then run the app as usual:
+
+```bash
+npm start               # serves on http://localhost:4200
+```
+
+### Using a private/internal npm registry
+
+If your environment requires a custom npm registry or auth token, place an `.npmrc` at
+`.devcontainer/.npmrc`. It is **gitignored** and copied into the container's home directory
+early in setup, so both the agent installs and `npm install` use it. If the file is absent,
+the default npm configuration is used.
+
+### Notes
+
+- Agents are installed at their **latest** versions on each fresh create.
+- The Nia repo currently publishes **pre-releases** only, so the CLI resolves to the latest
+  pre-release automatically; once a stable release exists, it will be preferred.
+- Re-run setup any time with: `bash .devcontainer/setup.sh`.
