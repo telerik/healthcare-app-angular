@@ -1,0 +1,13 @@
+# Tracks the Latest Project Nia Learn Demo Issues
+
+[lessons.rfa-investigation]
+ticket_id = 33
+
+[lessons.issue-validation]
+issue_number = 32
+
+[lessons.issue-refactoring]
+issue_number = 31
+
+[lessons.security-review]
+issue_number = 30
