@@ -12,6 +12,7 @@ schema_version = "1.0.0"
 name = "github_issues"
 type = "built-in"
 method = "cli"  # Options: "cli", "mcp", "api", "skill" (default)
+repository = "https://github.com/telerik/healthcare-app-angular.git"
 description = """
 GitHub Issues for task and bug tracking.
 Access via 'gh issue' CLI commands.
@@ -50,6 +51,7 @@ Common operations (repository configured — use --repo flag):
 name = "github_issues"
 type = "built-in"
 method = "cli"  # Options: "cli", "mcp", "api", "skill" (default)
+repository = "https://github.com/telerik/healthcare-app-angular.git"
 description = """
 GitHub Issues for RFA ticket tracking (development-focused).
 Note: For customer-facing tickets, consider using a dedicated support platform.
