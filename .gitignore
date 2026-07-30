@@ -43,11 +43,16 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 
+# Telerik/Kendo UI license key — never commit the real file (use the .example template)
+telerik-license.txt
+
 # Dev container local secrets (copied from the host, never commit)
 .devcontainer/.npmrc
 
 # Nia CLI — local state, caches, logs and machine-specific config (do NOT commit).
-# Committed Nia config (.nia/config/project.toml, agents.toml, toolchain.toml) is kept tracked.
+# Committed Nia config (.nia/config/project.toml, toolchain.toml) is kept tracked.
+# agents.toml is machine/user-specific — commit agents.toml.example instead.
+.nia/config/agents.toml
 .nia/context.toml
 .nia/.context.lock
 .nia/cache/

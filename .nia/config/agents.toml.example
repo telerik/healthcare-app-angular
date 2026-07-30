@@ -1,0 +1,102 @@
+# =============================================================================
+# agents.toml.example — Nia AI agent configuration (TEMPLATE)
+# =============================================================================
+#
+# WHAT THIS FILE DOES
+#   Selects which AI coding agent Nia drives (GitHub Copilot, OpenCode, Claude
+#   Code, ...) and which model each workflow uses. Nia resolves a model for
+#   every command from the most specific setting that applies.
+#
+# HOW TO USE THIS TEMPLATE
+#   1. Copy it into place:
+#          cp .nia/config/agents.toml.example .nia/config/agents.toml
+#      (Or let Nia generate one for you: `nia config init --agent github_copilot --models stable`)
+#   2. Set `agent.default` to the agent you have installed and authenticated.
+#   3. Adjust the model names / overrides below to taste, then delete the
+#      examples you don't need.
+#   4. Validate: `nia config validate`
+#
+# MODEL RESOLUTION ORDER (most specific wins)
+#   1. --model command-line override
+#   2. operations["target.operation"]   e.g. "issue.plan"
+#   3. targets["target"]                 e.g. "issue"
+#   4. agent default `model`
+#
+# NOTE: agents.toml is optional and supports hierarchical loading (repo → app →
+#       user → system). Model-name validation only warns on unknown names; it
+#       does not block execution.
+# =============================================================================
+
+schema_version = "1.0.0"
+
+# -----------------------------------------------------------------------------
+# Select the default agent. The value MUST match one of the [agent.<name>]
+# tables below. Supported agent IDs: github_copilot, opencode, claude_code.
+# -----------------------------------------------------------------------------
+[agent]
+default = "github_copilot"
+
+
+# =============================================================================
+# EXAMPLE 1 — GitHub Copilot (recommended starting point)
+# =============================================================================
+[agent.github_copilot]
+# Default model for every target/operation unless overridden below.
+model = "claude-sonnet-4.5"
+
+# Optional: override the model for a whole workflow target (issue, code, pr, docs).
+# [agent.github_copilot.targets]
+# issue = "claude-haiku-4.5"   # cheaper/faster for issue work
+# code  = "claude-opus-4.5"    # premium for writing code
+
+# Optional: override the model for a single "target.operation".
+# Operation overrides beat target overrides.
+[agent.github_copilot.operations]
+"issue.plan" = "claude-opus-4.5"   # use a premium model for planning
+# "pr.review"  = "claude-opus-4.5"
+# "code.fix"   = "claude-haiku-4.5"
+
+# Optional: custom agent personas defined inside Copilot itself.
+# [agent.github_copilot.custom_agents]
+# issue = "issue-specialist"
+# pr    = "pr-reviewer"
+#
+# [agent.github_copilot.custom_agent_operations]
+# "code.review" = "senior-reviewer"
+
+# Optional: force the prompt format ("xml" or "markdown").
+# Defaults to "xml" for Claude/Anthropic models, "markdown" otherwise.
+# prompt_format = "xml"
+
+# Optional: override the agent executable if it is not on PATH.
+# command = "/usr/local/bin/copilot"
+
+
+# =============================================================================
+# EXAMPLE 2 — OpenCode (multi-provider; uses provider/model names)
+# Delete EXAMPLE 1 above and set `default = "opencode"` to use this.
+# =============================================================================
+# [agent.opencode]
+# model = "github-copilot/claude-sonnet-4.5"
+#
+# [agent.opencode.operations]
+# "issue.plan" = "github-copilot/claude-opus-4.5"
+
+
+# =============================================================================
+# EXAMPLE 3 — Claude Code (Anthropic; note hyphenated versions, e.g. 4-5)
+# Delete EXAMPLE 1 above and set `default = "claude_code"` to use this.
+# =============================================================================
+# [agent.claude_code]
+# model = "claude-sonnet-4-5"
+#
+# [agent.claude_code.operations]
+# "issue.plan" = "claude-opus-4-5"
+
+
+# =============================================================================
+# EXAMPLE 4 — Extended per-operation form (model + commit toggle + persona)
+# Any target/operation value can be a table instead of a plain model string.
+# =============================================================================
+# [agent.github_copilot.operations]
+# "code.review" = { model = "claude-opus-4.5", commits = "off", custom_agent = "quality-auditor", prompt_format = "xml" }
