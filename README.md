@@ -7,9 +7,11 @@
 <h1 align="center">Healthcare Application — Kendo UI for Angular</h1>
 
 <p align="center">
-  A full-featured healthcare dashboard built with <a href="https://www.telerik.com/kendo-angular-ui/components">Kendo UI for Angular</a>, designed to demonstrate how clinical workflows can be modeled in a modern Angular application.
+  A full-featured healthcare dashboard built with <a href="https://www.telerik.com/kendo-angular-ui/components">Kendo UI for Angular</a>, designed to demonstrate how clinical workflows can be modeled in a modern Angular application — and to serve as a hands-on playground for the <a href="https://github.com/telerik/project-nia">Nia</a> agentic SDLC CLI.
   <br />
   <a href="https://telerik.github.io/kendo-angular/healthcare-app"><strong>View Live Demo »</strong></a>
+  &nbsp;·&nbsp;
+  <a href="#experiment-with-the-nia-cli"><strong>Experiment with Nia »</strong></a>
 </p>
 
 <p align="center">
@@ -23,70 +25,134 @@
   <li><strong>Schedule</strong> — A multi-view scheduler (day, week, month, agenda) for managing appointments, paired with a daily task list that supports search and inline task creation.</li>
   <li><strong>Clinical Analytics</strong> — Charts tracking patient vitals over time (systolic/diastolic BP, heart rate, SpO2, temperature) and a risk assessment overview with export support.</li>
 </ul>
-
----
-
-## Components Used
-
-| Component  | Docs                                                                                     |
-| ---------- | ---------------------------------------------------------------------------------------- |
-| Breadcrumb | [Breadcrumb](https://www.telerik.com/kendo-angular-ui/components/navigation/breadcrumb/) |
-| Buttons    | [Buttons](https://www.telerik.com/kendo-angular-ui/components/buttons/button/)           |
-| Dialog     | [Dialog](https://www.telerik.com/kendo-angular-ui/components/dialog/)                    |
-| DropDowns  | [DropDowns](https://www.telerik.com/kendo-angular-ui/components/dropdowns/)              |
-| Editor     | [Editor](https://www.telerik.com/kendo-angular-ui/components/editor/)                    |
-| Gauges     | [Gauges](https://www.telerik.com/kendo-angular-ui/components/gauges/)                    |
-| Grid       | [Grid Component](https://www.telerik.com/kendo-angular-ui/components/grid/)              |
-| Icons      | [Icons](https://www.telerik.com/kendo-angular-ui/components/icons/icon/)                 |
-| Indicators | [Indicators](https://www.telerik.com/kendo-angular-ui/components/indicators/)            |
-| Inputs     | [Inputs](https://www.telerik.com/kendo-angular-ui/components/inputs/)                    |
-| Layout     | [Layout](https://www.telerik.com/kendo-angular-ui/components/layout/)                    |
-| Scheduler  | [Scheduler](https://www.telerik.com/kendo-angular-ui/components/scheduler/)              |
-| Toolbar    | [Toolbar](https://www.telerik.com/kendo-angular-ui/components/toolbar/)                  |
+               |
 
 ---
 
 ## Getting Started
 
+This is a standalone repository — run it on its own, then layer in the [Nia CLI](#experiment-with-the-nia-cli) to experiment with AI-assisted workflows.
+
 > The sample project runs with the [currently supported Angular version](https://www.telerik.com/kendo-angular-ui/components/installation/requirements/#toc-angular).
 
+### 1. Get the code
+
 ```bash
-# 1. Clone the repository
-git clone https://github.com/telerik/kendo-angular.git
+# Fork + clone (recommended — lets you open pull requests with Nia)
+gh repo fork telerik/healthcare-app-angular --clone
+cd healthcare-app-angular
 
-# 2. Navigate to the project folder
-cd examples-standalone/healthcare-app
+# ...or clone directly
+# git clone https://github.com/telerik/healthcare-app-angular.git
+# cd healthcare-app-angular
+```
 
-# 3. Install dependencies
+### 2. Install dependencies
+
+```bash
 npm install
 ```
 
-## Development Server
+### 3. Run the development server
 
 ```bash
-ng serve
+npm start          # or: ng serve
 ```
 
 Navigate to `http://localhost:4200/`. The app reloads automatically when source files change.
 
-## Build
+### Build
 
 ```bash
-ng build
+npm run build      # or: ng build
 ```
 
 Build artifacts are stored in the `dist/` directory.
 
 ---
 
-## Dev Container — Get Started Fast with the Nia CLI
+## Experiment with the Nia CLI
 
-This repository ships a [Dev Container](.devcontainer) that provisions a ready-to-use
-environment for both Angular development and AI-assisted workflows. It installs Node.js,
-the GitHub CLI, three AI coding agents, and the **[Nia CLI](https://github.com/telerik/project-nia)**,
-then installs the project's dependencies — so you can start coding (and running Nia) within minutes.
+This repository is a ready-made playground for **[Nia](https://github.com/telerik/project-nia)** — Progress's agentic SDLC CLI. Use it to drive AI-assisted workflows against a realistic Angular codebase: plan an issue, implement it, review the code, and draft a pull request.
 
-### What's included
+Nia authenticates through the AI coding agent you configure (GitHub Copilot CLI, Claude Code, or OpenCode) — **there is no separate Nia API key**.
+
+### Option A — Install locally (recommended)
+
+Complete [Getting Started](#getting-started) first, then run the steps below from the project root.
+
+**1. Install prerequisites**
+
+- **Node.js 18+** (`node --version`) — required for the coding agents. Get it from [nodejs.org](https://nodejs.org).
+- **GitHub CLI** (`gh --version`) — installs Nia and authenticates GitHub workflows. Install with `brew install gh`, `winget install --id GitHub.cli`, or `sudo apt install gh`, then run `gh auth login`.
+
+**2. Install an AI coding agent and sign in**
+
+Pick one:
+
+```bash
+# GitHub Copilot CLI — reuses your existing gh authentication (shortest path)
+npm install -g @github/copilot && copilot --version
+
+# Claude Code — run `claude` once to sign in
+npm install -g @anthropic-ai/claude-code && claude
+
+# OpenCode
+npm install -g opencode-ai && opencode auth login
+```
+
+**3. Install the Nia CLI**
+
+```bash
+# Linux / macOS
+gh release download --repo telerik/project-nia --pattern 'install.sh'
+sh install.sh
+```
+
+```powershell
+# Windows (PowerShell 6+)
+gh release download --repo telerik/project-nia --pattern 'install.ps1'
+.\install.ps1
+```
+
+Open a new terminal so the updated `PATH` takes effect, then verify:
+
+```bash
+nia --version
+```
+
+**4. Initialize Nia in this project**
+
+```bash
+# GitHub Issues + GitHub as the code platform. Swap --agent to match step 2
+# (github_copilot | claude_code | opencode).
+nia config init --issues github_issues --code github --agent github_copilot --models stable
+```
+
+Prefer to stay offline? Use a local-only setup instead:
+
+```bash
+nia config init --issues local --code local --agent github_copilot --models stable
+```
+
+**5. Run your first workflow**
+
+```bash
+nia config set-issue <issue-number>   # e.g. an issue in your fork
+nia issue plan                        # generate an implementation plan
+nia code create                       # implement the approved plan
+nia code review                       # review the result
+```
+
+For the complete walkthrough — including build, test, and pull request steps — follow the **[Nia Quick Start](https://telerik.github.io/project-nia/quick-start.html)**.
+
+---
+
+### Option B — Dev Container / Codespaces (optional accelerator)
+
+This repository ships a [Dev Container](.devcontainer) that provisions everything in Option A automatically: Node.js, the GitHub CLI, the three AI coding agents, and the **Nia CLI** — plus it runs `npm install`. It's the fastest way to reach a working environment, and it runs identically in **GitHub Codespaces** and in a local VS Code Dev Container.
+
+#### What's included
 
 | Component                          | Details                                                                                                                                     |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -99,14 +165,16 @@ then installs the project's dependencies — so you can start coding (and runnin
 | **Angular dependencies**           | `npm install` runs automatically on create                                                                                                  |
 | **Port 4200**                      | Forwarded for `ng serve`                                                                                                                    |
 
-### Prerequisites
+#### Prerequisites
 
 - [Docker](https://www.docker.com/) running locally
 - One of:
   - [VS Code](https://code.visualstudio.com/) + the **Dev Containers** extension (`ms-vscode-remote.remote-containers`), or
   - the [Dev Containers CLI](https://github.com/devcontainers/cli) (`npm install -g @devcontainers/cli`)
 
-### Open the container
+> Using **GitHub Codespaces**? None of the above is required — open the repo on GitHub and choose **Code → Codespaces → Create codespace**. The container builds in the cloud.
+
+#### Open the container
 
 **VS Code:** open the folder, then run **Dev Containers: Reopen in Container** from the Command Palette (`Cmd/Ctrl+Shift+P`).
 
@@ -117,11 +185,9 @@ devcontainer up --workspace-folder .
 devcontainer exec --workspace-folder . bash
 ```
 
-On first create, the container runs [`.devcontainer/setup.sh`](.devcontainer/setup.sh),
-which installs the agents, installs the Nia CLI, runs `npm install`, and prints a version
-summary plus the manual next steps below.
+On first create, the container runs [`.devcontainer/setup.sh`](.devcontainer/setup.sh), which installs the agents, installs the Nia CLI, runs `npm install`, and prints a version summary plus the manual next steps below.
 
-### Finalize your setup (manual, one-time)
+#### Finalize your setup (manual, one-time)
 
 Authentication is intentionally left to you (credentials are user/org-specific):
 
@@ -129,22 +195,18 @@ Authentication is intentionally left to you (credentials are user/org-specific):
 # 1. Authenticate the GitHub CLI (used by Nia workflows)
 gh auth login
 
-# 2. Authenticate the AI coding agents you plan to use
+# 2. Authenticate the AI coding agent you plan to use
 copilot                 # GitHub Copilot CLI — sign in when prompted
-claude                  # Claude Code — set ANTHROPIC_API_KEY or sign in
-opencode auth login
-
-# 3. Provide Nia / agent credentials (replace with your onboarding values)
-# export NIA_API_KEY="<your-nia-api-key>"
-# export ANTHROPIC_API_KEY="<your-anthropic-api-key>"
+claude                  # Claude Code — sign in when prompted
+opencode auth login     # OpenCode
 ```
 
-### Start using the Nia CLI
+#### Start using the Nia CLI
 
 ```bash
 nia --version           # confirm the CLI is installed
+nia config init --issues github_issues --code github --agent github_copilot --models stable
 nia --help              # explore available commands
-nia learn               # guided, hands-on onboarding tutorials
 ```
 
 Then run the app as usual:
@@ -153,16 +215,12 @@ Then run the app as usual:
 npm start               # serves on http://localhost:4200
 ```
 
-### Using a private/internal npm registry
+#### Using a private/internal npm registry
 
-If your environment requires a custom npm registry or auth token, place an `.npmrc` at
-`.devcontainer/.npmrc`. It is **gitignored** and copied into the container's home directory
-early in setup, so both the agent installs and `npm install` use it. If the file is absent,
-the default npm configuration is used.
+If your environment requires a custom npm registry or auth token, place an `.npmrc` at `.devcontainer/.npmrc`. It is **gitignored** and copied into the container's home directory early in setup, so both the agent installs and `npm install` use it. If the file is absent, the default npm configuration is used.
 
-### Notes
+#### Notes
 
 - Agents are installed at their **latest** versions on each fresh create.
-- The Nia repo currently publishes **pre-releases** only, so the CLI resolves to the latest
-  pre-release automatically; once a stable release exists, it will be preferred.
+- The Nia repo currently publishes **pre-releases** only, so the CLI resolves to the latest pre-release automatically; once a stable release exists, it will be preferred.
 - Re-run setup any time with: `bash .devcontainer/setup.sh`.
