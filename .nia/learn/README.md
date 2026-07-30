@@ -63,8 +63,8 @@ These numbers must point at issues/tickets that actually exist in
   expects a GitHub issue or ticket:
 
   ```toml
-  [lessons.backlog-planning]
-  issue_number = 40
+  [lessons.<lesson-id>]
+  issue_number = 16
   ```
 
 Use `ticket_id` for investigation/ticket lessons and `issue_number` for development lessons.

@@ -56,18 +56,6 @@ model = "claude-sonnet-4.5"
 # "pr.review"  = "claude-opus-4.5"
 # "code.fix"   = "claude-haiku-4.5"
 
-# Optional: custom agent personas defined inside Copilot itself.
-# [agent.github_copilot.custom_agents]
-# issue = "issue-specialist"
-# pr    = "pr-reviewer"
-#
-# [agent.github_copilot.custom_agent_operations]
-# "code.review" = "senior-reviewer"
-
-# Optional: force the prompt format ("xml" or "markdown").
-# Defaults to "xml" for Claude/Anthropic models, "markdown" otherwise.
-# prompt_format = "xml"
-
 # Optional: override the agent executable if it is not on PATH.
 # command = "/usr/local/bin/copilot"
 
@@ -92,11 +80,3 @@ model = "claude-sonnet-4.5"
 #
 # [agent.claude_code.operations]
 # "issue.plan" = "claude-opus-4-5"
-
-
-# =============================================================================
-# EXAMPLE 4 — Extended per-operation form (model + commit toggle + persona)
-# Any target/operation value can be a table instead of a plain model string.
-# =============================================================================
-# [agent.github_copilot.operations]
-# "code.review" = { model = "claude-opus-4.5", commits = "off", custom_agent = "quality-auditor", prompt_format = "xml" }
