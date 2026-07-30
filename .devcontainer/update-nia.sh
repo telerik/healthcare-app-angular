@@ -148,7 +148,7 @@ if curl -fsSL "${installer_url}" -o "${tmp_installer}" 2>/dev/null && [ -s "${tm
     echo "  Running vendor installer (version ${version})..."
     installer_args=(--version "${version}")
     if [ "${is_prerelease}" = "true" ]; then
-        installer_args=(--pre-release)
+        installer_args+=(--pre-release)
     fi
     if sh "${tmp_installer}" "${installer_args[@]}" && command -v nia &> /dev/null; then
         installed=true
