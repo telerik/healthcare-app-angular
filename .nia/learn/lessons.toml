@@ -1,7 +1,7 @@
 # Tracks the Latest Project Nia Learn Demo Issues
 
 [lessons.rfa-investigation]
-ticket_id = 33
+ticket_id = "33"
 
 [lessons.issue-validation]
 issue_number = 32
