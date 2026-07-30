@@ -61,7 +61,7 @@ resolve_nia_release() {
     fi
 
     local releases_json
-    if ! releases_json=$(curl -fsSL "${auth_header[@]}" \
+    if ! releases_json=$(curl -fsSL "${auth_header[@]+"${auth_header[@]}"}" \
         -H "Accept: application/vnd.github+json" "${api}" 2>/dev/null); then
         return 1
     fi
