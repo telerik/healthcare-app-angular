@@ -1,0 +1,9 @@
+schema_version = "1.0.0"
+
+[project]
+name = "healthcare-app-angular"
+description = "Healthcare dashboard application with patient management, scheduling, and analytics"
+language = "TypeScript"
+framework = "Angular 22 with Kendo UI for Angular"
+testing_framework = "Vitest"
+package_manager = "npm"
