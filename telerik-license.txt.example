@@ -1,0 +1,6 @@
+Paste Your Telerik or Kendo UI License Here
+
+# Setup:
+#   cp telerik-license.txt.example telerik-license.txt
+# Then replace the line above with your actual license key.
+# telerik-license.txt is gitignored and must never be committed.
