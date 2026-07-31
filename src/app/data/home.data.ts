@@ -7,9 +7,10 @@ export interface DailyAlert {
   condition: string;
   value: string;
   normalRange: string;
-  priority: string;
+  priority: 'High' | 'Medium';
   details: string;
   recommendations: string[];
+  suggestedAction: string;
 }
 
 export interface HomePatient {
@@ -43,6 +44,7 @@ export const DAILY_ALERTS: DailyAlert[] = [
       'Schedule follow-up appointment within 48 hours',
       'Consider antibiotic treatment if infection is suspected',
     ],
+    suggestedAction: 'Order inflammatory markers panel and review for infection signs immediately',
   },
   {
     id: 2,
@@ -63,6 +65,7 @@ export const DAILY_ALERTS: DailyAlert[] = [
       'Consider adjusting or adding medication',
       'Advise lifestyle modifications (diet, exercise, stress management)',
     ],
+    suggestedAction: 'Review antihypertensive medication dosage and order ECG for cardiac assessment',
   },
   {
     id: 3,
@@ -83,6 +86,7 @@ export const DAILY_ALERTS: DailyAlert[] = [
       'Consider starting metformin if HbA1c confirms progression',
       'Schedule follow-up in 2 weeks to monitor glucose levels',
     ],
+    suggestedAction: 'Schedule HbA1c test and diabetes education consultation within one week',
   },
   {
     id: 4,
@@ -103,6 +107,7 @@ export const DAILY_ALERTS: DailyAlert[] = [
       'Recommend regular aerobic exercise program',
       'Recheck lipid panel in 6-8 weeks after treatment initiation',
     ],
+    suggestedAction: 'Discuss statin therapy options and refer to dietitian for lifestyle counseling',
   },
   {
     id: 5,
@@ -122,6 +127,7 @@ export const DAILY_ALERTS: DailyAlert[] = [
       'Consider iron supplementation if iron-deficiency confirmed',
       'Schedule transfusion evaluation if levels drop below 8 g/dL',
     ],
+    suggestedAction: 'Order iron studies and complete blood count; assess for bleeding source urgently',
   },
   {
     id: 6,
@@ -141,6 +147,7 @@ export const DAILY_ALERTS: DailyAlert[] = [
       'Ensure adequate hydration',
       'Consult nephrology if levels do not improve within 48 hours',
     ],
+    suggestedAction: 'Discontinue nephrotoxic medications immediately and order renal ultrasound',
   },
   {
     id: 7,
@@ -161,6 +168,7 @@ export const DAILY_ALERTS: DailyAlert[] = [
       'Cardiology consult urgently',
       'Prepare for possible stress test or angiography',
     ],
+    suggestedAction: 'Order troponin levels stat and request urgent cardiology consultation',
   },
   {
     id: 8,
@@ -180,6 +188,7 @@ export const DAILY_ALERTS: DailyAlert[] = [
       'Order repeat electrolyte panel in 24 hours',
       'Advise high-potassium diet (bananas, leafy greens)',
     ],
+    suggestedAction: 'Start oral potassium supplementation and recheck electrolytes in 24 hours',
   },
 ];
 
