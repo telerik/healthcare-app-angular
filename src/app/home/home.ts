@@ -56,6 +56,7 @@ import {
 import { MarkdownPipe } from '../pipes/markdown.pipe';
 import { AppointmentsService, GridAppointment } from '../services/appointments.service';
 import { PageHeaderService } from '../services/page-header.service';
+import { LoggingService } from '../services/logging.service';
 
 @Component({
   selector: 'app-home',
@@ -288,6 +289,7 @@ Dr. Carter`;
   private pageHeaderService = inject(PageHeaderService);
   private router = inject(Router);
   private appointmentsService = inject(AppointmentsService);
+  private logger = inject(LoggingService);
 
   constructor() {
     const date = new Date();
@@ -329,9 +331,10 @@ Dr. Carter`;
     
     // Fallback: return first patient with warning (demo data mismatch handling)
     if (PATIENTS_DATA.length > 0) {
-      console.warn(
+      this.logger.warn(
         `Patient with code "${alertPatientId}" not found in PATIENTS_DATA. ` +
-        `Using fallback patient "${PATIENTS_DATA[0].name}" for demo purposes.`
+        `Using fallback patient "${PATIENTS_DATA[0].name}" for demo purposes.`,
+        { alertPatientId, fallbackPatient: PATIENTS_DATA[0].name }
       );
       return PATIENTS_DATA[0];
     }
@@ -353,9 +356,10 @@ Dr. Carter`;
     }
     
     // Fallback: return first patient in list
-    console.warn(
+    this.logger.warn(
       `Home patient with ID "${alertPatientId}" not found. ` +
-      `Using fallback patient "${this.patients[0]?.name}" for demo purposes.`
+      `Using fallback patient "${this.patients[0]?.name}" for demo purposes.`,
+      { alertPatientId, fallbackPatient: this.patients[0]?.name }
     );
     return this.patients[0];
   }
@@ -459,7 +463,7 @@ Dr. Carter`;
    */
   public reviewAlertPatient(): void {
     if (!this.selectedAlert) {
-      console.warn('No alert selected for review');
+      this.logger.warn('No alert selected for review');
       return;
     }
 
@@ -473,7 +477,10 @@ Dr. Carter`;
       this.navigateToPatientProfile(patient.id);
     } else {
       // Fallback: navigate to patients list
-      console.error(`Could not find patient for alert: ${this.selectedAlert.patientId}`);
+      this.logger.error(
+        `Could not find patient for alert: ${this.selectedAlert.patientId}`,
+        { alertPatientId: this.selectedAlert.patientId }
+      );
       this.router.navigate(['/patients']);
     }
   }
@@ -485,7 +492,7 @@ Dr. Carter`;
    */
   public addNoteFromAlert(): void {
     if (!this.selectedAlert) {
-      console.warn('No alert selected for adding note');
+      this.logger.warn('No alert selected for adding note');
       return;
     }
 
@@ -513,7 +520,7 @@ Dr. Carter`;
    */
   public requestTestFromAlert(): void {
     if (!this.selectedAlert) {
-      console.warn('No alert selected for requesting test');
+      this.logger.warn('No alert selected for requesting test');
       return;
     }
 
