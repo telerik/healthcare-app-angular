@@ -312,6 +312,52 @@ Dr. Carter`;
     this.pageHeaderService.subtitle.set('');
   }
 
+  /**
+   * Finds a patient profile by alert patient ID.
+   * Attempts exact match on patientCode, falls back to first patient if not found.
+   * @param alertPatientId - The patient ID from the alert (e.g., "P-105328")
+   * @returns PatientProfile or null if no patients exist
+   */
+  public findPatientByAlertId(alertPatientId: string): PatientProfile | null {
+    // Try exact match on patientCode
+    const patient = PATIENTS_DATA.find(p => p.patientCode === alertPatientId);
+    if (patient) {
+      return patient;
+    }
+    
+    // Fallback: return first patient with warning (demo data mismatch handling)
+    if (PATIENTS_DATA.length > 0) {
+      console.warn(
+        `Patient with code "${alertPatientId}" not found in PATIENTS_DATA. ` +
+        `Using fallback patient "${PATIENTS_DATA[0].name}" for demo purposes.`
+      );
+      return PATIENTS_DATA[0];
+    }
+    
+    return null;
+  }
+
+  /**
+   * Finds a HomePatient by alert patient ID for dropdown pre-selection.
+   * Matches on the patientId field in HOME_PATIENTS.
+   * @param alertPatientId - The patient ID from the alert (e.g., "P-104582")
+   * @returns HomePatient or first patient as fallback
+   */
+  public findHomePatientByAlertId(alertPatientId: string): HomePatient {
+    // Try exact match on patientId
+    const homePatient = this.patients.find(p => p.patientId === alertPatientId);
+    if (homePatient) {
+      return homePatient;
+    }
+    
+    // Fallback: return first patient in list
+    console.warn(
+      `Home patient with ID "${alertPatientId}" not found. ` +
+      `Using fallback patient "${this.patients[0]?.name}" for demo purposes.`
+    );
+    return this.patients[0];
+  }
+
   public navigateToSchedule(): void {
     this.router.navigate(['/schedule']);
   }
