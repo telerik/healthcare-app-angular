@@ -1,11 +1,5 @@
 # Tracks the Latest Project Nia Learn Demo Issues
 
-[lessons.ask-architecture]
-issue_number = 1
-
-[lessons.ask-developer-guide]
-issue_number = 16
-
 [lessons.rfa-investigation]
 ticket_id = 33
 
@@ -17,6 +11,3 @@ issue_number = 31
 
 [lessons.security-review]
 issue_number = 30
-
-[lessons.backlog-creation]
-issue_number = 10
