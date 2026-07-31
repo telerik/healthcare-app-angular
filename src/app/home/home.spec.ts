@@ -102,4 +102,157 @@ describe('HomeComponent', () => {
       });
     });
   });
+
+  describe('Alert Actions - Phase 3', () => {
+    let mockAlert: any;
+
+    beforeEach(() => {
+      mockAlert = {
+        id: 1,
+        title: 'Test Alert',
+        patient: 'Test Patient',
+        patientId: 'P-104582',
+        time: 'Now',
+        condition: 'Test Condition',
+        value: '100',
+        normalRange: '50-80',
+        priority: 'High' as const,
+        details: 'Test details',
+        recommendations: ['Rec 1'],
+        suggestedAction: 'Test action',
+      };
+      component.selectedAlert = mockAlert;
+      component.alertDialogOpened = true;
+    });
+
+    describe('reviewAlertPatient', () => {
+      it('should close dialog and navigate to patient profile', () => {
+        const navigateSpy = spyOn(component, 'navigateToPatientProfile');
+        
+        component.reviewAlertPatient();
+        
+        expect(component.alertDialogOpened).toBeFalse();
+        expect(navigateSpy).toHaveBeenCalled();
+      });
+
+      it('should handle missing selectedAlert', () => {
+        spyOn(console, 'warn');
+        component.selectedAlert = null;
+        
+        component.reviewAlertPatient();
+        
+        expect(console.warn).toHaveBeenCalledWith('No alert selected for review');
+      });
+
+      it('should navigate to patients list if patient not found', () => {
+        component.selectedAlert = { ...mockAlert, patientId: 'P-999999' };
+        spyOn(console, 'error');
+        
+        component.reviewAlertPatient();
+        
+        expect(router.navigate).toHaveBeenCalledWith(['/patients']);
+      });
+    });
+
+    describe('addNoteFromAlert', () => {
+      it('should pre-populate and open clinical note dialog', () => {
+        component.addNoteFromAlert();
+        
+        expect(component.alertDialogOpened).toBeFalse();
+        expect(component.clinicalNoteDialogOpened).toBeTrue();
+        expect(component.clinicalNoteText).toContain('Test Patient');
+        expect(component.clinicalNoteText).toContain('Test Condition');
+        expect(component.clinicalNoteText).toContain('100');
+        expect(component.clinicalNoteText).toContain('50-80');
+      });
+
+      it('should handle missing selectedAlert', () => {
+        spyOn(console, 'warn');
+        component.selectedAlert = null;
+        
+        component.addNoteFromAlert();
+        
+        expect(console.warn).toHaveBeenCalledWith('No alert selected for adding note');
+        expect(component.clinicalNoteDialogOpened).toBeFalse();
+      });
+
+      it('should pre-select patient in dropdown', () => {
+        component.addNoteFromAlert();
+        
+        expect(component.selectedPatient).toBeTruthy();
+        expect(component.selectedPatient?.patientId).toBe('P-104582');
+      });
+    });
+
+    describe('requestTestFromAlert', () => {
+      it('should pre-select patient and open lab test dialog', () => {
+        component.requestTestFromAlert();
+        
+        expect(component.alertDialogOpened).toBeFalse();
+        expect(component.labTestDialogOpened).toBeTrue();
+        expect(component.labTestPatient).toBeTruthy();
+        expect(component.labTestPatient?.patientId).toBe('P-104582');
+      });
+
+      it('should clear previous lab test selections', () => {
+        component.labTests[0].selected = true;
+        component.labTests[1].selected = true;
+        
+        component.requestTestFromAlert();
+        
+        expect(component.labTests.every(t => !t.selected)).toBeTrue();
+      });
+
+      it('should handle missing selectedAlert', () => {
+        spyOn(console, 'warn');
+        component.selectedAlert = null;
+        
+        component.requestTestFromAlert();
+        
+        expect(console.warn).toHaveBeenCalledWith('No alert selected for requesting test');
+        expect(component.labTestDialogOpened).toBeFalse();
+      });
+    });
+
+    describe('generateNoteFromAlert', () => {
+      it('should include alert patient name', () => {
+        const note = (component as any).generateNoteFromAlert(mockAlert);
+        
+        expect(note).toContain('Test Patient');
+      });
+
+      it('should include condition and values', () => {
+        const note = (component as any).generateNoteFromAlert(mockAlert);
+        
+        expect(note).toContain('Test Condition');
+        expect(note).toContain('100');
+        expect(note).toContain('50-80');
+      });
+
+      it('should include priority', () => {
+        const note = (component as any).generateNoteFromAlert(mockAlert);
+        
+        expect(note).toContain('High');
+      });
+
+      it('should include clinical details', () => {
+        const note = (component as any).generateNoteFromAlert(mockAlert);
+        
+        expect(note).toContain('Test details');
+      });
+
+      it('should include timestamp', () => {
+        const note = (component as any).generateNoteFromAlert(mockAlert);
+        
+        expect(note).toContain('Alert Follow-up Note');
+      });
+
+      it('should include action placeholders', () => {
+        const note = (component as any).generateNoteFromAlert(mockAlert);
+        
+        expect(note).toContain('[Document your clinical decision and actions here]');
+        expect(note).toContain('[Document follow-up plan here]');
+      });
+    });
+  });
 });
