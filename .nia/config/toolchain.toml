@@ -11,8 +11,7 @@ schema_version = "1.0.0"
 [issue_tracker]
 name = "github_issues"
 type = "built-in"
-method = "cli"  # Options: "cli", "mcp", "api", "skill" (default)
-repository = "https://github.com/telerik/healthcare-app-angular.git"
+method = "cli"  # Options: "cli", "mcp", "api", "local", "skill" (default)
 description = """
 GitHub Issues for task and bug tracking.
 Access via 'gh issue' CLI commands.
@@ -30,7 +29,7 @@ Common operations (repository configured — use --repo flag):
 [code_platform]
 name = "github"
 type = "built-in"
-method = "cli"  # Options: "cli", "mcp", "api", "skill" (default)
+method = "cli"  # Options: "cli", "mcp", "api", "local", "skill" (default)
 description = """
 GitHub for code hosting and collaboration.
 Access via 'gh' CLI commands.
@@ -48,20 +47,7 @@ Common operations (repository configured — use --repo flag):
 
 # Ticket tracker configuration
 [ticket_tracker]
-name = "github_issues"
+name = "local"
 type = "built-in"
-method = "cli"  # Options: "cli", "mcp", "api", "skill" (default)
-repository = "https://github.com/telerik/healthcare-app-angular.git"
-description = """
-GitHub Issues for RFA ticket tracking (development-focused).
-Note: For customer-facing tickets, consider using a dedicated support platform.
-Access via 'gh issue' CLI commands.
+method = "local"  # Options: "cli", "mcp", "api", "local", "skill"(default)
 
-Repository: {{ticket_tracker_repo_slug}}
-
-Common operations (repository configured — use --repo flag):
- - List tickets:   gh issue list --repo {{ticket_tracker_repo_slug}}
- - View ticket:    gh issue view {{ticket_id}} --repo {{ticket_tracker_repo_slug}}
- - Create ticket:  gh issue create --title "..." --body "..." --repo {{ticket_tracker_repo_slug}}
- - Update ticket:  gh issue edit {{ticket_id}} --title "..." --repo {{ticket_tracker_repo_slug}}
-"""
