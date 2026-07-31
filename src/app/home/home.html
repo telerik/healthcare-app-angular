@@ -516,14 +516,14 @@
           kendoButton 
           (click)="addNoteFromAlert()"
           [svgIcon]="stickyNoteIcon"
-          aria-label="Add clinical note for {{ selectedAlert.patient }}">
+          aria-label="Add clinical note for {{ selectedAlert?.patient }}">
           Add Note
         </button>
         <button 
           kendoButton 
           (click)="requestTestFromAlert()"
           [svgIcon]="fileDataIcon"
-          aria-label="Request lab test for {{ selectedAlert.patient }}">
+          aria-label="Request lab test for {{ selectedAlert?.patient }}">
           Request Test
         </button>
         <button 
@@ -531,14 +531,14 @@
           themeColor="primary"
           (click)="reviewAlertPatient()"
           [svgIcon]="eyeIcon"
-          aria-label="Review patient profile for {{ selectedAlert.patient }}">
+          aria-label="Review patient profile for {{ selectedAlert?.patient }}">
           Review
         </button>
         <button 
           kendoButton 
           themeColor="primary" 
           (click)="acknowledgeAlert()"
-          aria-label="Acknowledge alert for {{ selectedAlert.patient }}">
+          aria-label="Acknowledge alert for {{ selectedAlert?.patient }}">
           Acknowledge
         </button>
       </div>
