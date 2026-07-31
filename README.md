@@ -121,6 +121,14 @@ Open a new terminal so the updated `PATH` takes effect, then verify:
 nia --version
 ```
 
+Already have Nia installed and want the latest release later on? Re-run the vendor installer above (`sh install.sh` / `.\install.ps1`), or, if you're using this repo's dev container, run the bundled helper script instead — it detects your current version, resolves the newest release from GitHub, and reinstalls only when needed:
+
+```bash
+.devcontainer/update-nia.sh          # update to latest (no-op if already current)
+.devcontainer/update-nia.sh --check  # only report current vs. latest, no changes
+.devcontainer/update-nia.sh --force  # reinstall even if already on the latest version
+```
+
 **4. Initialize Nia in this project**
 
 ```bash
