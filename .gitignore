@@ -57,10 +57,14 @@ telerik-license.txt
 .nia/.context.lock
 .nia/cache/
 .nia/logs/
-.nia/work/job_*/
-.nia/config/opensearch.toml
+.nia/work/*/
+.nia/config/workflows/
 .nia/config/telemetry.toml
 .heartbeat
 sessions.toml
 .workflow.lock
 .sessions.lock
+learn.lock
+system.log
+transaction.jsonl
+*.trace.md
