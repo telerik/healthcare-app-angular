@@ -1,4 +1,4 @@
-import { inject, Pipe, PipeTransform } from '@angular/core';
+import { inject, Pipe, PipeTransform, SecurityContext } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { marked } from 'marked';
 
@@ -27,7 +27,7 @@ export class MarkdownPipe implements PipeTransform {
 
     try {
       const html = marked.parse(value);
-      return this.sanitizer.sanitize(1, html) || '';
+      return this.sanitizer.sanitize(SecurityContext.HTML, html) || '';
     } catch (error) {
       console.error('Markdown parsing error:', error);
       return value;
