@@ -38,6 +38,9 @@ export class PatientsService {
    * Update patient notes
    */
   public updatePatientNotes(id: number, notes: string): boolean {
+    if (Number.isNaN(id)) {
+      throw new Error('Invalid patient ID: NaN is not allowed');
+    }
     const patient = this.patientsData.find((p) => p.id === id);
     if (patient) {
       patient.notes = notes;
