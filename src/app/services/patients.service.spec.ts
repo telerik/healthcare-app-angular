@@ -40,4 +40,18 @@ describe('PatientsService', () => {
     expect(updated).toBe(true);
     expect(profile?.notes).toBe('Dummy test notes');
   });
+
+  it('should throw error when getPatientById receives NaN', () => {
+    expect(() => service.getPatientById(NaN)).toThrow('Invalid patient ID: NaN is not allowed');
+  });
+
+  it('should return null when getPatientById receives Infinity', () => {
+    const patient = service.getPatientById(Infinity);
+    expect(patient).toBeNull();
+  });
+
+  it('should return null when getPatientById receives decimal', () => {
+    const patient = service.getPatientById(1.5);
+    expect(patient).toBeNull();
+  });
 });
