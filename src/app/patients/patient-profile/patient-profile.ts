@@ -97,6 +97,12 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
   }
 
   private loadPatientData(): void {
+    if (Number.isNaN(this.patientId)) {
+      console.error('Invalid patient ID: NaN');
+      this.router.navigate(['/patients']);
+      return;
+    }
+
     const patientData = this.patientsService.getPatientById(this.patientId);
     if (patientData) {
       this.patient = patientData;
