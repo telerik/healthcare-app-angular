@@ -54,4 +54,8 @@ describe('PatientsService', () => {
     const patient = service.getPatientById(1.5);
     expect(patient).toBeNull();
   });
+
+  it('should throw error when updatePatientNotes receives NaN', () => {
+    expect(() => service.updatePatientNotes(NaN, 'test notes')).toThrow('Invalid patient ID: NaN is not allowed');
+  });
 });
