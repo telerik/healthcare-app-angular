@@ -18,12 +18,6 @@ export interface HomePatient {
   patientId: string;
 }
 
-export interface LabTest {
-  id: number;
-  name: string;
-  selected: boolean;
-}
-
 export const DAILY_ALERTS: DailyAlert[] = [
   {
     id: 1,
@@ -189,17 +183,4 @@ export const HOME_PATIENTS: HomePatient[] = [
   { id: 3, name: 'Michael Chen', patientId: 'P-105821' },
   { id: 4, name: 'Emily Davis', patientId: 'P-103764' },
   { id: 5, name: 'Robert Martinez', patientId: 'P-106235' },
-];
-
-export const LAB_TESTS: LabTest[] = [
-  { id: 1, name: 'Complete blood count (CBC)', selected: false },
-  { id: 2, name: 'Comprehensive metabolic panel (CMP)', selected: true },
-  { id: 3, name: 'Basic metabolic panel (BMP)', selected: false },
-  { id: 4, name: 'Lipid panel', selected: false },
-  { id: 5, name: 'Thyroid function tests (TSH, T3, T4)', selected: false },
-  { id: 6, name: 'Hemoglobin A1C (HbA1c)', selected: false },
-  { id: 7, name: 'Liver function tests (LFTs)', selected: false },
-  { id: 8, name: 'Urinalysis', selected: false },
-  { id: 9, name: 'Vitamin D levels', selected: false },
-  { id: 10, name: 'Prostate-specific antigen (PSA)', selected: false },
 ];

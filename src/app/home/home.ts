@@ -47,14 +47,14 @@ import { PATIENTS_DATA, PatientProfile } from '../data/patients.data';
 import {
   DAILY_ALERTS,
   HOME_PATIENTS,
-  LAB_TESTS,
   DailyAlert,
   HomePatient,
-  LabTest,
 } from '../data/home.data';
+import { LAB_TEST_OPTIONS, LabRequestPatient, LabTestRequest } from '../data/lab-tests.data';
 import { MarkdownPipe } from '../pipes/markdown.pipe';
 import { AppointmentsService, GridAppointment } from '../services/appointments.service';
 import { PageHeaderService } from '../services/page-header.service';
+import { LabTestRequestDialogComponent } from '../shared/lab-test-request-dialog/lab-test-request-dialog';
 
 @Component({
   selector: 'app-home',
@@ -76,6 +76,7 @@ import { PageHeaderService } from '../services/page-header.service';
     KENDO_POPUP,
     KENDO_CONVERSATIONALUI,
     MarkdownPipe,
+    LabTestRequestDialogComponent,
   ],
 })
 export class HomeComponent implements OnInit, OnDestroy {
@@ -268,10 +269,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   public selectedPatient = this.patients[0];
   public clinicalNoteText = '';
 
-  // Lab Test Dialog data
-  public labTestPatient: HomePatient = this.patients[0];
-  public labTestSearchQuery = '';
-  public labTests: LabTest[] = [...LAB_TESTS];
+  public labRequestPatients: readonly LabRequestPatient[] = this.patients.map((patient) => ({
+    id: patient.id,
+    name: patient.name,
+    identifier: patient.patientId,
+  }));
+  public labTestPatientId = this.labRequestPatients[0].id;
 
   // Message Nurse Dialog data
   public recipientEmail = 'oliviaparker@email.com';
@@ -343,29 +346,17 @@ Dr. Carter`;
     this.labTestDialogOpened = false;
   }
 
-  public sendLabTestRequest(): void {
-    const selectedTests = this.labTests.filter((test) => test.selected);
+  public handleLabTestRequest(request: LabTestRequest): void {
+    const patient = this.labRequestPatients.find((candidate) => candidate.id === request.patientId);
+    const selectedTests = LAB_TEST_OPTIONS.filter((test) => request.testIds.includes(test.id));
     console.log(
       'Sending lab test request for:',
-      this.labTestPatient?.name,
+      patient?.name,
       'Tests:',
       selectedTests,
     );
     // Here you would typically send via a service
     this.closeLabTestDialog();
-  }
-
-  public get filteredLabTests() {
-    if (!this.labTestSearchQuery) {
-      return this.labTests;
-    }
-    return this.labTests.filter((test) =>
-      test.name.toLowerCase().includes(this.labTestSearchQuery.toLowerCase()),
-    );
-  }
-
-  public toggleLabTest(test: LabTest): void {
-    test.selected = !test.selected;
   }
 
   public openMessageNurseDialog(): void {

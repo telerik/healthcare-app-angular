@@ -3,6 +3,73 @@
   margin-top: 24px;
 }
 
+.vitals-card:focus-visible {
+  outline: 2px solid var(--kendo-color-primary, #334155);
+  outline-offset: 2px;
+}
+
+.recommendation-panel {
+  margin-bottom: 24px;
+  overflow: hidden;
+  border: none;
+  border-radius: 16px;
+  box-shadow:
+    0px 1px 3px rgba(0, 0, 0, 0.04),
+    0px 2px 6px -1px rgba(0, 0, 0, 0.06);
+  background: #ffffff;
+}
+
+.recommendation-panel kendo-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+
+.recommendation-panel-header h2,
+.recommendation-panel-header p {
+  margin: 0;
+}
+
+.recommendation-panel-header h2 {
+  font-size: 20px;
+  line-height: 150%;
+}
+
+.recommendation-panel-header p {
+  color: #4a5666;
+}
+
+.recommendation-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.recommendation-action {
+  min-height: 96px;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 16px !important;
+  border: 1px solid rgba(23, 56, 99, 0.12);
+  background: #f8fafc;
+  text-align: left;
+}
+
+.recommendation-action .k-button-text,
+.recommendation-action span {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
+
+.recommendation-action small {
+  white-space: normal;
+  color: #4a5666;
+}
+
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -10,11 +77,19 @@
   margin-bottom: 24px;
 }
 
+.recommendation-actions {
+  grid-template-columns: 1fr;
+}
+
 .page-header > :first-child {
   display: flex;
   flex-direction: column;
   gap: 8px;
   flex-grow: 1;
+}
+
+.recommendation-panel kendo-card-body {
+  padding: 12px;
 }
 
 /* Kendo Breadcrumb overrides */

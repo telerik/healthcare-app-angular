@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation, inject } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  ViewEncapsulation,
+  inject,
+  viewChild,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChipThemeColor, KENDO_BUTTONS } from '@progress/kendo-angular-buttons';
 import { EditorCssSettings, KENDO_EDITOR } from '@progress/kendo-angular-editor';
@@ -13,11 +22,22 @@ import { KENDO_PAGER } from '@progress/kendo-angular-pager';
 import { KENDO_TOOLBAR } from '@progress/kendo-angular-toolbar';
 
 import { SortDescriptor } from '@progress/kendo-data-query';
-import { downloadIcon, homeIcon, sparklesIcon, SVGIcon, userIcon } from '@progress/kendo-svg-icons';
+import {
+  calendarIcon,
+  clipboardIcon,
+  downloadIcon,
+  eyeIcon,
+  homeIcon,
+  sparklesIcon,
+  SVGIcon,
+  userIcon,
+} from '@progress/kendo-svg-icons';
 
 import { LabResult, PatientProfile } from '../../data/patients.data';
+import { LabRequestPatient, LabTestRequest } from '../../data/lab-tests.data';
 import { PageHeaderService } from '../../services/page-header.service';
 import { PatientsService } from '../../services/patients.service';
+import { LabTestRequestDialogComponent } from '../../shared/lab-test-request-dialog/lab-test-request-dialog';
 
 @Component({
   selector: 'app-patient-profile',
@@ -37,6 +57,7 @@ import { PatientsService } from '../../services/patients.service';
     KENDO_GRID,
     KENDO_GRID_EXCEL_EXPORT,
     KENDO_PAGER,
+    LabTestRequestDialogComponent,
   ],
 })
 export class PatientProfileComponent implements OnInit, OnDestroy {
@@ -44,6 +65,9 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
 
   public downloadIcon: SVGIcon = downloadIcon;
   public sparklesIcon: SVGIcon = sparklesIcon;
+  public calendarIcon: SVGIcon = calendarIcon;
+  public clipboardIcon: SVGIcon = clipboardIcon;
+  public eyeIcon: SVGIcon = eyeIcon;
 
   public editorIframeCss: EditorCssSettings = {
     path: 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap',
@@ -71,6 +95,9 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
   public patient: PatientProfile | null = null;
   public labResults: LabResult[] = [];
   public labResultsSort: SortDescriptor[] = [{ field: 'testName', dir: 'asc' }];
+  public labTestDialogOpened = false;
+  public labRequestPatients: readonly LabRequestPatient[] = [];
+  public vitalsCard = viewChild<ElementRef<HTMLElement>>('vitalsCard');
 
   private pageHeaderService = inject(PageHeaderService);
   private route = inject(ActivatedRoute);
@@ -83,11 +110,19 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
 
     // Subscribe to route parameter changes to handle navigation between different patients
     this.route.paramMap.subscribe((params) => {
-      const id = params.get('id');
-      if (id) {
-        this.patientId = parseInt(id, 10);
-        this.loadPatientData();
+      this.patient = null;
+      this.labResults = [];
+      this.labRequestPatients = [];
+      this.labTestDialogOpened = false;
+
+      const patientId = Number(params.get('id'));
+      if (!Number.isInteger(patientId) || patientId <= 0) {
+        this.router.navigate(['/patients']);
+        return;
       }
+
+      this.patientId = patientId;
+      this.loadPatientData();
     });
   }
 
@@ -101,6 +136,13 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
     if (patientData) {
       this.patient = patientData;
       this.labResults = patientData.labResults;
+      this.labRequestPatients = [
+        {
+          id: patientData.id,
+          name: patientData.name,
+          identifier: patientData.patientCode,
+        },
+      ];
     } else {
       // Patient not found, navigate back to patients list
       this.router.navigate(['/patients']);
@@ -120,6 +162,43 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
   public saveNotes(): void {
     console.log('Saving patient notes...');
     // In a real app, save to backend service
+  }
+
+  public reviewVitals(): void {
+    const vitalsCard = this.vitalsCard();
+    if (!vitalsCard) {
+      throw new Error('Recent Vitals card is unavailable');
+    }
+
+    vitalsCard.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    vitalsCard.nativeElement.focus();
+  }
+
+  public openLabTestDialog(): void {
+    if (!this.patient) {
+      throw new Error('Cannot request labs without a loaded patient');
+    }
+
+    this.labTestDialogOpened = true;
+  }
+
+  public closeLabTestDialog(): void {
+    this.labTestDialogOpened = false;
+  }
+
+  public handleLabTestRequest(_request: LabTestRequest): void {
+    void _request;
+    this.closeLabTestDialog();
+  }
+
+  public scheduleFollowUp(): void {
+    if (!this.patient) {
+      throw new Error('Cannot schedule follow-up without a loaded patient');
+    }
+
+    this.router.navigate(['/schedule'], {
+      queryParams: { intent: 'follow-up', patientId: this.patient.id },
+    });
   }
 
   public exportToExcel(): void {

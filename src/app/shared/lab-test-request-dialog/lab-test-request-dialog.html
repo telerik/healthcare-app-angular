@@ -1,0 +1,77 @@
+<kendo-dialog
+  [width]="dialogWidth"
+  [height]="dialogHeight"
+  (close)="cancel()"
+  class="lab-test-dialog"
+>
+  <kendo-dialog-titlebar>
+    <div class="dialog-title">Request Lab Tests</div>
+  </kendo-dialog-titlebar>
+
+  <div class="dialog-content">
+    <div class="form-field">
+      <kendo-label text="Select Patient" labelCssClass="field-label">
+        <kendo-dropdownlist
+          [data]="patients()"
+          [(ngModel)]="selectedPatientId"
+          textField="name"
+          valueField="id"
+          [valuePrimitive]="true"
+          [style.width.px]="250"
+          adaptiveMode="auto"
+        >
+          <ng-template kendoDropDownListItemTemplate let-dataItem>
+            <span>{{ dataItem.name }} ({{ dataItem.identifier }})</span>
+          </ng-template>
+          <ng-template kendoDropDownListValueTemplate let-dataItem>
+            <span>{{ dataItem?.name }} ({{ dataItem?.identifier }})</span>
+          </ng-template>
+        </kendo-dropdownlist>
+      </kendo-label>
+    </div>
+
+    <div class="form-field">
+      <kendo-label text="Select Lab Tests" labelCssClass="field-label">
+        <kendo-textbox [(ngModel)]="searchQuery" placeholder="Search Lab Tests"></kendo-textbox>
+      </kendo-label>
+    </div>
+
+    <div class="lab-tests-list">
+      @for (test of filteredLabTests; track test.id) {
+        <div
+          class="lab-test-item"
+          [class.selected]="isTestSelected(test.id)"
+          role="button"
+          tabindex="0"
+          (click)="toggleLabTest(test.id)"
+          (keyup.enter)="toggleLabTest(test.id)"
+          (keyup.space)="toggleLabTest(test.id)"
+        >
+          <input
+            kendoCheckBox
+            type="checkbox"
+            class="lab-test-checkbox"
+            [checked]="isTestSelected(test.id)"
+            (click)="$event.stopPropagation()"
+            (change)="toggleLabTest(test.id)"
+            [attr.aria-label]="test.name"
+          />
+          <span class="lab-test-label">{{ test.name }}</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <kendo-dialog-actions layout="end">
+    <button kendoButton type="button" (click)="cancel()">Discard</button>
+    <button
+      kendoButton
+      type="button"
+      themeColor="primary"
+      [disabled]="selectedTestIds.size === 0"
+      (click)="submit()"
+    >
+      Send request
+    </button>
+  </kendo-dialog-actions>
+</kendo-dialog>

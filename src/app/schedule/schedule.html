@@ -1,4 +1,14 @@
 <section class="schedule-page">
+  @if (followUpPatient) {
+    <kendo-card class="follow-up-context-card" aria-labelledby="follow-up-scheduling-title">
+      <kendo-card-body>
+        <h2 id="follow-up-scheduling-title">Follow-up scheduling</h2>
+        <p>{{ followUpPatient.name }} ({{ followUpPatient.patientCode }})</p>
+        <p>Review schedule availability for this patient. No appointment has been booked.</p>
+      </kendo-card-body>
+    </kendo-card>
+  }
+
   <div class="schedule-layout">
     <!-- Left: Scheduler -->
     <kendo-card class="scheduler-card">

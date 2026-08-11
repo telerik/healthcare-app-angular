@@ -56,9 +56,14 @@
 
       <!-- Recent Vitals Card -->
       <kendo-card class="profile-card" width="100%">
-        <div class="vitals-content">
+        <div
+          #vitalsCard
+          class="vitals-content vitals-card"
+          tabindex="-1"
+          aria-labelledby="recent-vitals-title"
+        >
           <div class="vitals-container">
-            <h3 class="vitals-title">Recent Vitals</h3>
+            <h3 id="recent-vitals-title" class="vitals-title">Recent Vitals</h3>
             <div class="vital-row">
               <span class="vital-label">Heart Rate</span>
               <span class="vital-value">{{ patient.vitals.heartRate }}</span>
@@ -112,6 +117,59 @@
         </div>
       </kendo-card>
     </div>
+
+    <kendo-card class="recommendation-panel" aria-labelledby="recommended-next-steps-title">
+      <kendo-card-body>
+        <div class="recommendation-panel-header">
+          <h2 id="recommended-next-steps-title">Recommended next steps</h2>
+          <p>Continue care for {{ patient.name }}</p>
+        </div>
+        <div class="recommendation-actions">
+          <button
+            kendoButton
+            type="button"
+            fillMode="flat"
+            class="recommendation-action"
+            [attr.aria-label]="'Review vitals for ' + patient.name"
+            (click)="reviewVitals()"
+          >
+            <kendo-svgicon [icon]="eyeIcon"></kendo-svgicon>
+            <span><strong>Review vitals</strong><small>Check the latest recorded measurements</small></span>
+          </button>
+          <button
+            kendoButton
+            type="button"
+            fillMode="flat"
+            class="recommendation-action"
+            [attr.aria-label]="'Request lab tests for ' + patient.name"
+            (click)="openLabTestDialog()"
+          >
+            <kendo-svgicon [icon]="clipboardIcon"></kendo-svgicon>
+            <span><strong>Request lab</strong><small>Select tests for the current patient</small></span>
+          </button>
+          <button
+            kendoButton
+            type="button"
+            fillMode="flat"
+            class="recommendation-action"
+            [attr.aria-label]="'Schedule follow-up for ' + patient.name"
+            (click)="scheduleFollowUp()"
+          >
+            <kendo-svgicon [icon]="calendarIcon"></kendo-svgicon>
+            <span><strong>Schedule follow-up</strong><small>Review schedule availability for the next visit</small></span>
+          </button>
+        </div>
+      </kendo-card-body>
+    </kendo-card>
+
+    @if (labTestDialogOpened && patient) {
+      <app-lab-test-request-dialog
+        [patients]="labRequestPatients"
+        [initialPatientId]="patient.id"
+        (cancelled)="closeLabTestDialog()"
+        (requestSubmitted)="handleLabTestRequest($event)"
+      />
+    }
   }
 
   <!-- Patient Note Editor -->
