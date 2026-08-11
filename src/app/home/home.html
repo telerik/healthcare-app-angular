@@ -301,74 +301,12 @@
 
 <!-- Lab Test Dialog -->
 @if (labTestDialogOpened) {
-  <kendo-dialog
-    [width]="dlgW(690)"
-    [height]="dlgH(580)"
-    (close)="closeLabTestDialog()"
-    class="lab-test-dialog"
-  >
-    <kendo-dialog-titlebar>
-      <div class="dialog-title">Request Lab Tests</div>
-    </kendo-dialog-titlebar>
-
-    <div class="dialog-content">
-      <div class="form-field">
-        <kendo-label text="Select Patient" labelCssClass="field-label">
-          <kendo-dropdownlist
-            [data]="patients"
-            [(ngModel)]="labTestPatient"
-            textField="name"
-            valueField="id"
-            [valuePrimitive]="false"
-            [style.width.px]="250"
-            adaptiveMode="auto"
-          >
-            <ng-template kendoDropDownListItemTemplate let-dataItem>
-              <span>{{ dataItem.name }} ({{ dataItem.patientId }})</span>
-            </ng-template>
-            <ng-template kendoDropDownListValueTemplate let-dataItem>
-              <span>{{ dataItem?.name }} ({{ dataItem?.patientId }})</span>
-            </ng-template>
-          </kendo-dropdownlist>
-        </kendo-label>
-      </div>
-
-      <div class="form-field">
-        <kendo-label text="Select Lab Tests" labelCssClass="field-label">
-          <kendo-textbox [(ngModel)]="labTestSearchQuery" placeholder="Search Lab Tests">
-          </kendo-textbox>
-        </kendo-label>
-      </div>
-
-      <div class="lab-tests-list">
-        @for (test of filteredLabTests; track test.id) {
-          <div
-            class="lab-test-item"
-            [class.selected]="test.selected"
-            role="button"
-            tabindex="0"
-            (click)="toggleLabTest(test)"
-            (keyup.enter)="toggleLabTest(test)"
-            (keyup.space)="toggleLabTest(test)"
-          >
-            <kendo-checkbox #checkboxRef [(ngModel)]="test.selected" class="lab-test-checkbox">
-            </kendo-checkbox>
-            <kendo-label
-              class="k-checkbox-label lab-test-label"
-              [for]="checkboxRef"
-              [text]="test.name"
-            >
-            </kendo-label>
-          </div>
-        }
-      </div>
-    </div>
-
-    <kendo-dialog-actions layout="end">
-      <button kendoButton (click)="closeLabTestDialog()">Discard</button>
-      <button kendoButton themeColor="primary" (click)="sendLabTestRequest()">Send request</button>
-    </kendo-dialog-actions>
-  </kendo-dialog>
+  <app-lab-test-request-dialog
+    [patients]="labRequestPatients"
+    [initialPatientId]="labTestPatientId"
+    (cancelled)="closeLabTestDialog()"
+    (requestSubmitted)="handleLabTestRequest($event)"
+  />
 }
 
 <!-- Message Nurse Dialog -->

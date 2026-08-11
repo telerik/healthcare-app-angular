@@ -1,6 +1,7 @@
 import { Component, ViewEncapsulation, OnInit, HostListener, signal, inject } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import {
   KENDO_SCHEDULER,
   EventStyleArgs,
@@ -26,6 +27,8 @@ import {
 } from '@progress/kendo-svg-icons';
 import { AppointmentsService, SchedulerAppointment } from '../services/appointments.service';
 import { DailyTask, INITIAL_TASKS } from '../data/schedule.data';
+import { PatientProfile } from '../data/patients.data';
+import { PatientsService } from '../services/patients.service';
 
 @Component({
   selector: 'app-schedule',
@@ -78,6 +81,7 @@ export class ScheduleComponent implements OnInit {
   public selectedDate: Date;
   public taskSearch = '';
   public events: SchedulerAppointment[] = [];
+  public followUpPatient: PatientProfile | null = null;
 
   // Event Detail Dialog
   public eventDialogOpened = false;
@@ -118,6 +122,8 @@ export class ScheduleComponent implements OnInit {
   public tasks: DailyTask[] = [...INITIAL_TASKS];
 
   private appointmentsService = inject(AppointmentsService);
+  private route = inject(ActivatedRoute);
+  private patientsService = inject(PatientsService);
 
   constructor() {
     // Initialize selected date to the current real date.
@@ -126,6 +132,14 @@ export class ScheduleComponent implements OnInit {
 
   ngOnInit(): void {
     this.events = this.appointmentsService.getSchedulerAppointments();
+    this.route.queryParamMap.subscribe((params) => {
+      this.followUpPatient = null;
+
+      const patientId = Number(params.get('patientId'));
+      if (params.get('intent') === 'follow-up' && Number.isInteger(patientId) && patientId > 0) {
+        this.followUpPatient = this.patientsService.getPatientById(patientId);
+      }
+    });
   }
 
   public get filteredTasks(): DailyTask[] {
