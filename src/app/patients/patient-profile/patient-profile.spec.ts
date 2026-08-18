@@ -5,13 +5,11 @@ import { ActivatedRoute, ParamMap, convertToParamMap } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { vi } from 'vitest';
 import { PatientProfileComponent } from './patient-profile';
-import { PatientsService } from '../../services/patients.service';
 
 describe('PatientProfileComponent', () => {
   let component: PatientProfileComponent;
   let fixture: ComponentFixture<PatientProfileComponent>;
   let paramMapSubject: BehaviorSubject<ParamMap>;
-  let patientsService: PatientsService;
 
   beforeEach(async () => {
     // Create a controllable paramMap subject for testing
@@ -31,7 +29,6 @@ describe('PatientProfileComponent', () => {
       ],
     }).compileComponents();
 
-    patientsService = TestBed.inject(PatientsService);
     fixture = TestBed.createComponent(PatientProfileComponent);
     component = fixture.componentInstance;
   });
