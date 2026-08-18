@@ -28,6 +28,7 @@ export interface PatientProfile extends Patient {
   };
   notes: string;
   labResults: LabResult[];
+  allergies?: Allergy[];
 }
 
 export interface LabResult {
@@ -36,6 +37,31 @@ export interface LabResult {
   referenceRange: string;
   status: 'Critical' | 'Monitoring' | 'Stable';
   notes: string;
+}
+
+export interface Allergy {
+  allergen: string;
+  type: 'Drug Allergy' | 'Food Allergy' | 'Environmental';
+  severity: 'Mild' | 'Moderate' | 'Severe';
+  reaction: string;
+  firstReported: string;
+  symptoms: string[];
+  crossReactivities?: string[];
+  safeAlternatives?: string[];
+  emergencyProtocol?: string[];
+  notes?: string;
+}
+
+export interface ReasonForVisitData {
+  patient: string;
+  patientId: string;
+  appointmentDate: string;
+  visitType: string;
+  primaryConcern: string;
+  background: string;
+  previousVisits: { date: string; description: string }[];
+  objectives: string[];
+  preparationNotes?: string[];
 }
 
 export const PATIENTS_DATA: PatientProfile[] = [
