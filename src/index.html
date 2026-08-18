@@ -15,5 +15,20 @@
   </head>
   <body>
     <app-root></app-root>
+
+    <!--
+      OpenTelemetry browser tracing configuration (optional).
+      Uncomment and adjust to point traces at your OTLP/HTTP collector.
+      Do NOT commit real API keys here — inject them at deploy time.
+
+    <script>
+      window.__OTEL_CONFIG__ = {
+        serviceName: 'healthcare-app-angular',
+        collectorUrl: 'http://localhost:4318/v1/traces',
+        // headers: { Authorization: 'Bearer <token>' },
+        enabled: true,
+      };
+    </script>
+    -->
   </body>
 </html>

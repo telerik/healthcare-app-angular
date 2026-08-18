@@ -7,3 +7,10 @@ language = "TypeScript"
 framework = "Angular 22 with Kendo UI for Angular"
 testing_framework = "Vitest"
 package_manager = "npm"
+
+[beta_consent]
+acknowledged = true
+acknowledgement_date = "2026-08-18T06:32:22.435554+00:00"
+acknowledged_by = "nia"
+version_at_consent = "4.4.0"
+consent_phrase = "i agree"

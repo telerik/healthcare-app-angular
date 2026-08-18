@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation, inject } from '@angular/core';
+import { Component, DestroyRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChipThemeColor, KENDO_BUTTONS } from '@progress/kendo-angular-buttons';
 import { EditorCssSettings, KENDO_EDITOR } from '@progress/kendo-angular-editor';
@@ -76,19 +77,23 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private patientsService = inject(PatientsService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     this.pageHeaderService.title.set('Patients');
     this.pageHeaderService.subtitle.set('');
 
     // Subscribe to route parameter changes to handle navigation between different patients
-    this.route.paramMap.subscribe((params) => {
-      const id = params.get('id');
-      if (id) {
-        this.patientId = parseInt(id, 10);
-        this.loadPatientData();
-      }
-    });
+    // Using takeUntilDestroyed to automatically unsubscribe when component is destroyed
+    this.route.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        const id = params.get('id');
+        if (id) {
+          this.patientId = parseInt(id, 10);
+          this.loadPatientData();
+        }
+      });
   }
 
   ngOnDestroy(): void {
