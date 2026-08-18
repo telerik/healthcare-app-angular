@@ -508,6 +508,7 @@
       <div class="dialog-title">Visit Details</div>
     </kendo-dialog-titlebar>
 
+    @if (reasonForVisit) {
     <div class="dialog-content">
       <!-- Patient & Appointment Info -->
       <div class="alert-patient-info">
@@ -566,6 +567,15 @@
         </ul>
       </div>
     </div>
+    } @else {
+      <div class="dialog-content">
+        <div class="empty-state">
+          <kendo-svgicon [icon]="clipboardIcon" size="xlarge"></kendo-svgicon>
+          <h3>No Visit Information Available</h3>
+          <p>Visit details for this patient are not currently available.</p>
+        </div>
+      </div>
+    }
 
     <kendo-dialog-actions layout="end">
       <button kendoButton (click)="closeReasonForVisitDialog()">Close</button>
@@ -588,6 +598,7 @@
       <div class="dialog-title">⚠️ Critical Allergy Alert</div>
     </kendo-dialog-titlebar>
 
+    @if (allergyAlert) {
     <div class="dialog-content">
       <!-- Patient & Allergen Info -->
       <div class="alert-patient-info">
@@ -663,6 +674,15 @@
         <p class="details-text">{{ allergyAlert.notes }}</p>
       </div>
     </div>
+    } @else {
+      <div class="dialog-content">
+        <div class="empty-state">
+          <kendo-svgicon [icon]="pillIcon" size="xlarge"></kendo-svgicon>
+          <h3>No Known Allergies</h3>
+          <p>This patient has no documented drug allergies.</p>
+        </div>
+      </div>
+    }
 
     <kendo-dialog-actions layout="end">
       <button kendoButton (click)="closeAllergyAlertDialog()">Close</button>
@@ -685,6 +705,7 @@
       <div class="dialog-title">Visit Details</div>
     </kendo-dialog-titlebar>
 
+    @if (reasonForVisit) {
     <div class="dialog-content">
       <!-- Patient & Appointment Info -->
       <div class="alert-patient-info">
@@ -743,6 +764,15 @@
         </ul>
       </div>
     </div>
+    } @else {
+      <div class="dialog-content">
+        <div class="empty-state">
+          <kendo-svgicon [icon]="clipboardIcon" size="xlarge"></kendo-svgicon>
+          <h3>No Visit Information Available</h3>
+          <p>Visit details for this patient are not currently available.</p>
+        </div>
+      </div>
+    }
 
     <kendo-dialog-actions layout="end">
       <button kendoButton (click)="closeReasonForVisitDialog()">Close</button>
@@ -765,6 +795,7 @@
       <div class="dialog-title">⚠️ Critical Allergy Alert</div>
     </kendo-dialog-titlebar>
 
+    @if (allergyAlert) {
     <div class="dialog-content">
       <!-- Patient & Allergen Info -->
       <div class="alert-patient-info">
@@ -840,6 +871,15 @@
         <p class="details-text">{{ allergyAlert.notes }}</p>
       </div>
     </div>
+    } @else {
+      <div class="dialog-content">
+        <div class="empty-state">
+          <kendo-svgicon [icon]="pillIcon" size="xlarge"></kendo-svgicon>
+          <h3>No Known Allergies</h3>
+          <p>This patient has no documented drug allergies.</p>
+        </div>
+      </div>
+    }
 
     <kendo-dialog-actions layout="end">
       <button kendoButton (click)="closeAllergyAlertDialog()">Close</button>

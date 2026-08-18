@@ -43,7 +43,7 @@ import {
   stickyNoteIcon,
   xIcon,
 } from '@progress/kendo-svg-icons';
-import { PATIENTS_DATA, PatientProfile } from '../data/patients.data';
+import { PATIENTS_DATA, PatientProfile, ReasonForVisitData, Allergy } from '../data/patients.data';
 import {
   DAILY_ALERTS,
   HOME_PATIENTS,
@@ -55,6 +55,22 @@ import {
 import { MarkdownPipe } from '../pipes/markdown.pipe';
 import { AppointmentsService, GridAppointment } from '../services/appointments.service';
 import { PageHeaderService } from '../services/page-header.service';
+import { TracingService } from '../observability/tracing.service';
+
+interface AllergyAlertData {
+  patient: string;
+  patientId: string;
+  allergen: string;
+  allergyType: string;
+  severity: string;
+  reaction: string;
+  firstReported: string;
+  symptoms: string[];
+  crossReactivities: string[];
+  safeAlternatives: string[];
+  emergencyProtocol: string[];
+  notes: string;
+}
 
 @Component({
   selector: 'app-home',
@@ -142,6 +158,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   // Next Patient data
   public nextPatient: PatientProfile | null = null;
+  public currentAppointment: GridAppointment | null = null;
 
   // Dialog states
   public clinicalNoteDialogOpened = false;
@@ -191,77 +208,58 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   public selectedAlert: DailyAlert | null = null;
 
-  // Reason for Visit data
-  public reasonForVisit = {
-    patient: 'Isabella Rossi',
-    patientId: 'P-102563',
-    appointmentDate: 'Today, 9:30 AM',
-    visitType: 'Cardiology Follow-up',
-    primaryConcern: 'Post-procedure cardiac monitoring',
-    background:
-      'Patient is scheduled for a routine cardiology follow-up appointment following a successful cardiac catheterization procedure performed 6 weeks ago. The procedure was done to evaluate coronary artery disease.',
-    previousVisits: [
-      { date: '6 weeks ago', description: 'Cardiac catheterization procedure - successful' },
-      {
-        date: '3 months ago',
-        description: 'Initial cardiology consultation - chest pain evaluation',
-      },
-      { date: '4 months ago', description: 'Stress test - abnormal results' },
-    ],
-    objectives: [
-      'Review catheterization results and discuss findings',
-      'Assess current cardiac symptoms and medication response',
-      'Evaluate ECG and recent lab work',
-      'Review lifestyle modifications and cardiac rehabilitation progress',
-      'Adjust medication dosage if necessary',
-      'Schedule next follow-up appointment',
-    ],
-    preparationNotes: [
-      'Review patient chart and catheterization report',
-      'Have recent ECG and lab results available',
-      'Prepare medication adjustment options if needed',
-    ],
-  };
+  // Reason for Visit - dynamic getter
+  public get reasonForVisit(): ReasonForVisitData | null {
+    if (!this.nextPatient) return null;
+    
+    return {
+      patient: this.nextPatient.name,
+      patientId: this.nextPatient.patientCode,
+      appointmentDate: this.currentAppointment 
+        ? `Today, ${this.currentAppointment.time}` 
+        : 'Not scheduled',
+      visitType: this.currentAppointment?.reason ?? this.nextPatient.diagnosis,
+      primaryConcern: this.nextPatient.diagnosis,
+      background: this.nextPatient.notes.replace(/<br\s*\/?>/gi, '\n').substring(0, 500) + '...',
+      previousVisits: [
+        { date: 'Previous visit', description: 'See patient history for details' },
+      ],
+      objectives: [
+        `Review ${this.nextPatient.diagnosis} status`,
+        'Assess current symptoms and medication response',
+        'Evaluate recent lab results',
+        'Adjust treatment plan if necessary',
+        'Schedule follow-up appointment',
+      ],
+      preparationNotes: [
+        'Review patient chart',
+        'Have recent lab results available',
+        'Prepare medication adjustment options if needed',
+      ],
+    };
+  }
 
-  // Allergy Alert data
-  public allergyAlert = {
-    patient: 'Isabella Rossi',
-    patientId: 'P-102563',
-    allergen: 'Penicillin',
-    allergyType: 'Drug Allergy',
-    severity: 'Severe',
-    reaction: 'Anaphylaxis',
-    firstReported: 'March 2018',
-    symptoms: [
-      'Difficulty breathing and wheezing',
-      'Severe skin rash and hives',
-      'Swelling of face, lips, and throat',
-      'Rapid pulse and dizziness',
-      'Loss of consciousness (reported in initial episode)',
-    ],
-    crossReactivities: [
-      'Amoxicillin',
-      'Ampicillin',
-      'Other beta-lactam antibiotics',
-      'Possibly cephalosporins (use with caution)',
-    ],
-    safeAlternatives: [
-      'Fluoroquinolones (e.g., Levofloxacin, Ciprofloxacin)',
-      'Macrolides (e.g., Azithromycin, Clarithromycin)',
-      'Tetracyclines (e.g., Doxycycline)',
-      'Vancomycin for severe infections',
-    ],
-    emergencyProtocol: [
-      'Immediately discontinue any suspected beta-lactam antibiotic',
-      'Administer epinephrine 0.3-0.5mg IM if anaphylaxis symptoms appear',
-      'Administer antihistamines (Diphenhydramine 50mg)',
-      'Provide oxygen support and monitor vital signs',
-      'Call emergency response team',
-      'Be prepared for potential intubation if airway compromised',
-    ],
-    notes:
-      'Patient carries EpiPen at all times. Family members are trained in emergency response. Allergy documented in all medical records and patient wears medical alert bracelet.',
-  };
+  // Allergy Alert - dynamic getter
+  public get allergyAlert(): AllergyAlertData | null {
+    if (!this.nextPatient?.allergies?.length) return null;
+    
+    const allergy = this.nextPatient.allergies[0]; // Primary allergy
+    
+    return {
+      patient: this.nextPatient.name,
+      patientId: this.nextPatient.patientCode,
+      allergen: allergy.allergen,
+      allergyType: allergy.type,
+      severity: allergy.severity,
+      reaction: allergy.reaction,
+      firstReported: allergy.firstReported,
+      symptoms: allergy.symptoms,
+      crossReactivities: allergy.crossReactivities ?? [],
+      safeAlternatives: allergy.safeAlternatives ?? [],
+      emergencyProtocol: allergy.emergencyProtocol ?? [],
+      notes: allergy.notes ?? 'No additional notes.',
+    };
+  }
 
   // Clinical Note Dialog data
   public patients: HomePatient[] = [...HOME_PATIENTS];
@@ -286,6 +284,7 @@ Dr. Carter`;
   private pageHeaderService = inject(PageHeaderService);
   private router = inject(Router);
   private appointmentsService = inject(AppointmentsService);
+  private tracing = inject(TracingService);
 
   constructor() {
     const date = new Date();
@@ -303,7 +302,13 @@ Dr. Carter`;
     this.pageHeaderService.subtitle.set('Today is ' + this.currentDate);
     this.appointments = this.appointmentsService.getTodaysAppointments();
 
-    // Set next patient to Isabella Rossi (id: 3)
+    // Find the next upcoming or in-progress appointment
+    this.currentAppointment = this.appointments.find(
+      (a) => a.status === 'Upcoming' || a.status === 'In Progress'
+    ) ?? null;
+
+    // Set next patient based on appointment (will be fully implemented in PHASE-4)
+    // For now, keep existing logic to maintain compatibility
     this.nextPatient = PATIENTS_DATA.find((p) => p.id === 3) || null;
   }
 
@@ -436,19 +441,33 @@ Dr. Carter`;
     this.chatMessages = [...this.chatMessages, e.message];
 
     setTimeout(() => {
-      this.chatMessages = [
-        ...this.chatMessages,
-        {
-          id: guid(),
-          author: this.aiAssistant,
-          timestamp: new Date(),
-          text: `ℹ️ **This is a demo assistant.**
+      this.tracing.run(
+        'ai-assistant.free-text',
+        'workflow',
+        () => {
+          const text = `ℹ️ **This is a demo assistant.**
 
 Free-text queries are not supported in this preview. In your production app, connect a **real AI service** (e.g. OpenAI, Azure OpenAI, or your own clinical LLM) to handle any message.
 
-**In this demo, you can use the suggestion chips** to see pre-built responses.`,
+**In this demo, you can use the suggestion chips** to see pre-built responses.`;
+          this.chatMessages = [
+            ...this.chatMessages,
+            {
+              id: guid(),
+              author: this.aiAssistant,
+              timestamp: new Date(),
+              text,
+            },
+          ];
         },
-      ];
+        {
+          'app.component': 'home',
+          'gen_ai.system': 'mock',
+          'gen_ai.operation.name': 'chat',
+          'ai_assistant.input_type': 'free_text',
+          'ai_assistant.supported': false,
+        },
+      );
     }, 800);
   }
 
@@ -468,11 +487,15 @@ Free-text queries are not supported in this preview. In your production app, con
 
     // Handle different suggestions
     setTimeout(() => {
-      let responseText: string;
+      this.tracing.run(
+        'ai-assistant.suggestion',
+        'workflow',
+        (span) => {
+          let responseText: string;
 
-      if (suggestion.id === 1) {
-        // "Summary for next patient" - return hardcoded value
-        responseText = `📋 **Next Patient Summary**
+          if (suggestion.id === 1) {
+            // "Summary for next patient" - return hardcoded value
+            responseText = `📋 **Next Patient Summary**
 
 **Patient:** Isabella Rossi (P-102563)
 **Time:** 9:30 AM
@@ -493,9 +516,9 @@ Free-text queries are not supported in this preview. In your production app, con
 ✓ Evaluate ECG and recent lab work
 ✓ Check medication compliance
 ✓ Adjust treatment if necessary`;
-      } else if (suggestion.id === 2) {
-        // "Provide lab result for next patient"
-        responseText = `🔬 **Lab Results - Isabella Rossi (P-102563)**
+          } else if (suggestion.id === 2) {
+            // "Provide lab result for next patient"
+            responseText = `🔬 **Lab Results - Isabella Rossi (P-102563)**
 
 **Latest Lab Results** (Collected 2 days ago)
 
@@ -516,9 +539,9 @@ Free-text queries are not supported in this preview. In your production app, con
 • BNP: 45 pg/mL (Normal)
 
 **Overall Assessment:** All values within normal range. Cardiac markers show no signs of recent cardiac stress.`;
-      } else if (suggestion.id === 3) {
-        // "How many patients do I have today"
-        responseText = `📅 **Today's Schedule Overview**
+          } else if (suggestion.id === 3) {
+            // "How many patients do I have today"
+            responseText = `📅 **Today's Schedule Overview**
 
 You have **12 patients** scheduled for today:
 
@@ -541,21 +564,32 @@ You have **12 patients** scheduled for today:
 • 4:00 PM - Matthew Wilson (Blood Pressure Monitoring)
 
 **Status:** On schedule | **Next appointment:** 5 minutes`;
-      } else {
-        // For other suggestions, just acknowledge
-        console.log('Processing suggestion:', suggestion.text);
-        responseText = `I received your request: "${suggestion.text}". Processing...`;
-      }
+          } else {
+            // For other suggestions, just acknowledge
+            console.log('Processing suggestion:', suggestion.text);
+            responseText = `I received your request: "${suggestion.text}". Processing...`;
+          }
 
-      this.chatMessages = [
-        ...this.chatMessages,
-        {
-          id: guid(),
-          author: this.aiAssistant,
-          timestamp: new Date(),
-          text: responseText,
+          span.setAttribute('ai_assistant.response_length', responseText.length);
+          this.chatMessages = [
+            ...this.chatMessages,
+            {
+              id: guid(),
+              author: this.aiAssistant,
+              timestamp: new Date(),
+              text: responseText,
+            },
+          ];
         },
-      ];
+        {
+          'app.component': 'home',
+          'gen_ai.system': 'mock',
+          'gen_ai.operation.name': 'chat',
+          'ai_assistant.input_type': 'suggestion',
+          'ai_assistant.suggestion_id': suggestion.id,
+          'ai_assistant.suggestion_text': suggestion.text,
+        },
+      );
     }, 1500);
   }
 }
