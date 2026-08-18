@@ -233,6 +233,32 @@ export const PATIENTS_DATA: PatientProfile[] = [
         notes: 'No evidence of thrombosis',
       },
     ],
+    allergies: [
+      {
+        allergen: 'Shellfish',
+        type: 'Food Allergy',
+        severity: 'Moderate',
+        reaction: 'Urticaria and GI distress',
+        firstReported: 'January 2020',
+        symptoms: [
+          'Hives and skin itching',
+          'Nausea and vomiting',
+          'Abdominal cramping',
+          'Mild facial swelling',
+        ],
+        crossReactivities: [
+          'Crab',
+          'Lobster',
+          'Shrimp',
+          'Crayfish',
+        ],
+        safeAlternatives: [
+          'All finned fish (salmon, tuna, cod)',
+          'Mollusks may be tolerated (consult allergist)',
+        ],
+        notes: 'Patient avoids all shellfish. Carries antihistamines. Last reaction was mild and resolved with Benadryl.',
+      },
+    ],
   },
   {
     id: 2,
@@ -400,6 +426,25 @@ export const PATIENTS_DATA: PatientProfile[] = [
         referenceRange: '30-100',
         status: 'Monitoring',
         notes: 'Slightly low, supplementation recommended',
+      },
+    ],
+    allergies: [
+      {
+        allergen: 'Sulfa drugs',
+        type: 'Drug Allergy',
+        severity: 'Mild',
+        reaction: 'Skin rash',
+        firstReported: 'August 2019',
+        symptoms: [
+          'Maculopapular rash',
+          'Mild itching',
+          'No systemic symptoms',
+        ],
+        safeAlternatives: [
+          'Most other antibiotic classes are safe',
+          'Trimethoprim alone (without sulfamethoxazole)',
+        ],
+        notes: 'Reaction was mild and self-limiting. Patient tolerated sulfa-containing medications in the past without issue.',
       },
     ],
   },
@@ -571,6 +616,43 @@ export const PATIENTS_DATA: PatientProfile[] = [
         notes: 'Normal tissue perfusion',
       },
     ],
+    allergies: [
+      {
+        allergen: 'Penicillin',
+        type: 'Drug Allergy',
+        severity: 'Severe',
+        reaction: 'Anaphylaxis',
+        firstReported: 'March 2018',
+        symptoms: [
+          'Difficulty breathing and wheezing',
+          'Severe skin rash and hives',
+          'Swelling of face, lips, and throat',
+          'Rapid pulse and dizziness',
+          'Loss of consciousness (reported in initial episode)',
+        ],
+        crossReactivities: [
+          'Amoxicillin',
+          'Ampicillin',
+          'Other beta-lactam antibiotics',
+          'Possibly cephalosporins (use with caution)',
+        ],
+        safeAlternatives: [
+          'Fluoroquinolones (e.g., Levofloxacin, Ciprofloxacin)',
+          'Macrolides (e.g., Azithromycin, Clarithromycin)',
+          'Tetracyclines (e.g., Doxycycline)',
+          'Vancomycin for severe infections',
+        ],
+        emergencyProtocol: [
+          'Immediately discontinue any suspected beta-lactam antibiotic',
+          'Administer epinephrine 0.3-0.5mg IM if anaphylaxis symptoms appear',
+          'Administer antihistamines (Diphenhydramine 50mg)',
+          'Provide oxygen support and monitor vital signs',
+          'Call emergency response team',
+          'Be prepared for potential intubation if airway compromised',
+        ],
+        notes: 'Patient carries EpiPen at all times. Family members are trained in emergency response. Allergy documented in all medical records and patient wears medical alert bracelet.',
+      },
+    ],
   },
   {
     id: 4,
@@ -738,6 +820,32 @@ export const PATIENTS_DATA: PatientProfile[] = [
         referenceRange: '3.5-7.2',
         status: 'Stable',
         notes: 'Normal uric acid level',
+      },
+    ],
+    allergies: [
+      {
+        allergen: 'Latex',
+        type: 'Environmental',
+        severity: 'Moderate',
+        reaction: 'Contact dermatitis and respiratory symptoms',
+        firstReported: 'June 2021',
+        symptoms: [
+          'Contact dermatitis at exposure site',
+          'Sneezing and runny nose',
+          'Mild wheezing with prolonged exposure',
+        ],
+        crossReactivities: [
+          'Banana',
+          'Avocado',
+          'Kiwi',
+          'Chestnut',
+        ],
+        safeAlternatives: [
+          'Nitrile gloves',
+          'Vinyl gloves',
+          'Latex-free medical equipment',
+        ],
+        notes: 'Hospital flagged for latex-free room setup. Cross-reactive foods cause mild oral itching only.',
       },
     ],
   },
@@ -1078,6 +1186,36 @@ export const PATIENTS_DATA: PatientProfile[] = [
         notes: 'Normal iron stores',
       },
     ],
+    allergies: [
+      {
+        allergen: 'Ibuprofen',
+        type: 'Drug Allergy',
+        severity: 'Moderate',
+        reaction: 'Angioedema',
+        firstReported: 'April 2022',
+        symptoms: [
+          'Facial swelling',
+          'Lip and tongue swelling',
+          'Difficulty swallowing',
+        ],
+        crossReactivities: [
+          'Aspirin',
+          'Naproxen',
+          'Other NSAIDs',
+        ],
+        safeAlternatives: [
+          'Acetaminophen (Tylenol)',
+          'Celecoxib (COX-2 selective, use with caution)',
+        ],
+        emergencyProtocol: [
+          'Discontinue NSAID immediately',
+          'Administer antihistamines',
+          'Monitor airway closely',
+          'Epinephrine if airway compromise develops',
+        ],
+        notes: 'Patient should avoid all NSAIDs. Acetaminophen is safe for pain management.',
+      },
+    ],
   },
   {
     id: 7,
@@ -1247,6 +1385,7 @@ export const PATIENTS_DATA: PatientProfile[] = [
         notes: 'Reduced from dehydration, improving',
       },
     ],
+    allergies: [],
   },
   {
     id: 8,
