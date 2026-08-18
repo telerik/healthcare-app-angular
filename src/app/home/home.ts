@@ -307,9 +307,22 @@ Dr. Carter`;
       (a) => a.status === 'Upcoming' || a.status === 'In Progress'
     ) ?? null;
 
-    // Set next patient based on appointment (will be fully implemented in PHASE-4)
-    // For now, keep existing logic to maintain compatibility
-    this.nextPatient = PATIENTS_DATA.find((p) => p.id === 3) || null;
+    // Set next patient based on the appointment
+    if (this.currentAppointment) {
+      this.nextPatient = PATIENTS_DATA.find(
+        (p) => p.name === this.currentAppointment!.patientName
+      ) ?? null;
+    } else {
+      // Fallback: no upcoming appointments today
+      this.nextPatient = null;
+    }
+
+    // If patient not found in PATIENTS_DATA (name mismatch), show warning in console
+    if (this.currentAppointment && !this.nextPatient) {
+      console.warn(
+        `Next patient "${this.currentAppointment.patientName}" not found in PATIENTS_DATA`
+      );
+    }
   }
 
   ngOnDestroy(): void {

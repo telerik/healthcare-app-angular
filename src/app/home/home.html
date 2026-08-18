@@ -181,7 +181,7 @@
           <div class="info-card-content">
             <h4 class="info-card-title">Reason for visit</h4>
             <div class="info-card-bottom">
-              <span class="info-card-text">Cardiology Follow-up</span>
+              <span class="info-card-text">{{ currentAppointment?.reason ?? 'View details' }}</span>
               <span class="info-card-link">
                 <span class="link-text">Details</span>
                 <kendo-svgicon [icon]="chevronRightIcon"></kendo-svgicon>
@@ -205,7 +205,7 @@
           <div class="info-card-content">
             <h4 class="info-card-title">Allergy Alert</h4>
             <div class="info-card-bottom">
-              <span class="info-card-text">Penicillin</span>
+              <span class="info-card-text">{{ allergyAlert?.allergen ?? 'No known allergies' }}</span>
               <span class="info-card-link">
                 <span class="link-text">Details</span>
                 <kendo-svgicon [icon]="chevronRightIcon"></kendo-svgicon>
