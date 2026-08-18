@@ -28,6 +28,7 @@ import { eyeIcon, downloadIcon, sparklesIcon, SVGIcon } from '@progress/kendo-sv
 import { Patient } from '../data/patients.data';
 import { PageHeaderService } from '../services/page-header.service';
 import { PatientsService } from '../services/patients.service';
+import { TracingService } from '../observability/tracing.service';
 import { MarkdownPipe } from '../pipes/markdown.pipe';
 import { SortDescriptor } from '@progress/kendo-data-query';
 
@@ -102,6 +103,7 @@ export class PatientsComponent implements OnInit, AfterViewInit, OnDestroy {
   private pageHeaderService = inject(PageHeaderService);
   private router = inject(Router);
   private patientsService = inject(PatientsService);
+  private tracing = inject(TracingService);
 
   ngOnInit(): void {
     this.pageHeaderService.title.set('Patients');
@@ -143,19 +145,33 @@ export class PatientsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.chatMessages = [...this.chatMessages, e.message];
 
     setTimeout(() => {
-      this.chatMessages = [
-        ...this.chatMessages,
-        {
-          id: guid(),
-          author: this.aiAssistant,
-          timestamp: new Date(),
-          text: `ℹ️ **This is a demo assistant.**
+      this.tracing.run(
+        'ai-assistant.free-text',
+        'workflow',
+        () => {
+          const text = `ℹ️ **This is a demo assistant.**
 
 Free-text queries are not supported in this preview. In your production app, connect a **real AI service** (e.g. OpenAI, Azure OpenAI, or your own clinical LLM) to handle any message.
 
-**In this demo, you can use the suggestion chips** to see pre-built responses.`,
+**In this demo, you can use the suggestion chips** to see pre-built responses.`;
+          this.chatMessages = [
+            ...this.chatMessages,
+            {
+              id: guid(),
+              author: this.aiAssistant,
+              timestamp: new Date(),
+              text,
+            },
+          ];
         },
-      ];
+        {
+          'app.component': 'patients',
+          'gen_ai.system': 'mock',
+          'gen_ai.operation.name': 'chat',
+          'ai_assistant.input_type': 'free_text',
+          'ai_assistant.supported': false,
+        },
+      );
     }, 800);
   }
 
@@ -173,36 +189,40 @@ Free-text queries are not supported in this preview. In your production app, con
     ];
 
     setTimeout(() => {
-      let responseText = '';
+      this.tracing.run(
+        'ai-assistant.suggestion',
+        'workflow',
+        (span) => {
+          let responseText = '';
 
-      if (suggestion.id === 1) {
-        const wardCounts: Record<string, number> = {};
-        this.patients.forEach((p) => {
-          wardCounts[p.ward] = (wardCounts[p.ward] || 0) + 1;
-        });
-        const wardList = Object.entries(wardCounts)
-          .sort((a, b) => b[1] - a[1])
-          .map(([ward, count]) => `• **${ward}**: ${count} patient${count > 1 ? 's' : ''}`)
-          .join('\n');
-        responseText = `🏥 **Ward Distribution**
+          if (suggestion.id === 1) {
+            const wardCounts: Record<string, number> = {};
+            this.patients.forEach((p) => {
+              wardCounts[p.ward] = (wardCounts[p.ward] || 0) + 1;
+            });
+            const wardList = Object.entries(wardCounts)
+              .sort((a, b) => b[1] - a[1])
+              .map(([ward, count]) => `• **${ward}**: ${count} patient${count > 1 ? 's' : ''}`)
+              .join('\n');
+            responseText = `🏥 **Ward Distribution**
 
 **Total Patients:** ${this.patients.length}
 
 ${wardList}
 
 Use the grid filters to view patients by a specific ward.`;
-      } else if (suggestion.id === 2) {
-        const criticalPatients = this.patients.filter((p) => p.status === 'Critical');
-        responseText = `🚨 **Critical Patients** (${criticalPatients.length})
+          } else if (suggestion.id === 2) {
+            const criticalPatients = this.patients.filter((p) => p.status === 'Critical');
+            responseText = `🚨 **Critical Patients** (${criticalPatients.length})
 
 ${criticalPatients.map((p, i) => `${i + 1}. **${p.name}** — ${p.diagnosis}, ${p.ward} (Age ${p.age})`).join('\n')}
 
 These patients require immediate attention. Click **View Profile** to review their vitals and lab results.`;
-      } else if (suggestion.id === 3) {
-        const critical = this.patients.filter((p) => p.status === 'Critical').length;
-        const monitoring = this.patients.filter((p) => p.status === 'Monitoring').length;
-        const stable = this.patients.filter((p) => p.status === 'Stable').length;
-        responseText = `📊 **Patient Status Summary**
+          } else if (suggestion.id === 3) {
+            const critical = this.patients.filter((p) => p.status === 'Critical').length;
+            const monitoring = this.patients.filter((p) => p.status === 'Monitoring').length;
+            const stable = this.patients.filter((p) => p.status === 'Stable').length;
+            responseText = `📊 **Patient Status Summary**
 
 | Status | Count |
 |---|---|
@@ -212,31 +232,43 @@ These patients require immediate attention. Click **View Profile** to review the
 | **Total** | **${this.patients.length}** |
 
 ${critical > 0 ? `⚠️ ${critical} patient${critical > 1 ? 's require' : ' requires'} urgent review.` : '✅ No critical patients at this time.'}`;
-      } else if (suggestion.id === 4) {
-        const diagnosisCounts: Record<string, number> = {};
-        this.patients.forEach((p) => {
-          diagnosisCounts[p.diagnosis] = (diagnosisCounts[p.diagnosis] || 0) + 1;
-        });
-        const diagnosisList = Object.entries(diagnosisCounts)
-          .sort((a, b) => b[1] - a[1])
-          .map(
-            ([diagnosis, count]) => `• **${diagnosis}**: ${count} patient${count > 1 ? 's' : ''}`,
-          )
-          .join('\n');
-        responseText = `🩺 **Diagnoses Overview**
+          } else if (suggestion.id === 4) {
+            const diagnosisCounts: Record<string, number> = {};
+            this.patients.forEach((p) => {
+              diagnosisCounts[p.diagnosis] = (diagnosisCounts[p.diagnosis] || 0) + 1;
+            });
+            const diagnosisList = Object.entries(diagnosisCounts)
+              .sort((a, b) => b[1] - a[1])
+              .map(
+                ([diagnosis, count]) =>
+                  `• **${diagnosis}**: ${count} patient${count > 1 ? 's' : ''}`,
+              )
+              .join('\n');
+            responseText = `🩺 **Diagnoses Overview**
 
 ${diagnosisList}
 
 Use the **Diagnosis** column filter in the grid to focus on a specific condition.`;
-      }
+          }
 
-      const responseMessage: Message = {
-        id: guid(),
-        author: this.aiAssistant,
-        text: responseText,
-        timestamp: new Date(),
-      };
-      this.chatMessages = [...this.chatMessages, responseMessage];
+          const responseMessage: Message = {
+            id: guid(),
+            author: this.aiAssistant,
+            text: responseText,
+            timestamp: new Date(),
+          };
+          span.setAttribute('ai_assistant.response_length', responseText.length);
+          this.chatMessages = [...this.chatMessages, responseMessage];
+        },
+        {
+          'app.component': 'patients',
+          'gen_ai.system': 'mock',
+          'gen_ai.operation.name': 'chat',
+          'ai_assistant.input_type': 'suggestion',
+          'ai_assistant.suggestion_id': suggestion.id,
+          'ai_assistant.suggestion_text': suggestion.text,
+        },
+      );
     }, 1000);
   }
 }

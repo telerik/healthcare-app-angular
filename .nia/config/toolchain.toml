@@ -11,17 +11,206 @@ schema_version = "1.0.0"
 [issue_tracker]
 name = "github_issues"
 type = "built-in"
-method = "cli"  # Options: "cli", "mcp", "api", "local", "skill" (default)
+method = "skill"  # Options: "cli", "mcp", "api", "skill" (default)
+description = """
+When retrieving or reading issues from the issue tracker, use the "{{issue_tracker_skill_name}}" skill.
+This skill provides guidance on authentication, commands, error handling, and workflow
+best practices for your configured issue tracker.
+"""
+
+# [CLI Method]:
+# description = """
+# GitHub Issues for task and bug tracking.
+# Access via 'gh issue' CLI commands.
+#
+# {{#if issue_tracker_repo_slug}}Repository: {{issue_tracker_repo_slug}}
+#
+# Common operations (repository configured — use --repo flag):
+# - List issues:   gh issue list --repo {{issue_tracker_repo_slug}}
+# - View issue:    gh issue view {{issue_id}} --repo {{issue_tracker_repo_slug}}
+# - Create issue:  gh issue create --title "..." --body "..." --repo {{issue_tracker_repo_slug}}
+# - Update issue:  gh issue edit {{issue_id}} --title "..." --repo {{issue_tracker_repo_slug}}
+# {{/if}}
+# {{#unless issue_tracker_repo_slug}}Common operations:
+# - List issues:   gh issue list
+# - View issue:    gh issue view {{issue_id}}
+# - Create issue:  gh issue create --title "..." --body "..."
+# - Update issue:  gh issue edit {{issue_id}} --title "..."
+# {{/unless}}
+# """
+
+# [MCP Method]:
+# description = """
+# GitHub Issues for task and bug tracking.
+# Access via GitHub MCP Server.
+# The MCP server provides tools for listing, viewing, and managing issues.
+# All authentication is handled by the MCP server configuration.
+# """
+
+# [API Method]:
+# description = """
+# GitHub Issues for task and bug tracking.
+# Access via GitHub REST API.
+#
+# Authentication: API token required
+# - Environment variable: NIA_ISSUE_TOKEN
+# - Scope: Read and write access to repository issues
+# - Management: User-managed; set externally before running Nia
+# - Security: Nia does not inject tokens into logs, traces, or prompts
+#
+# The Coding Agent will read this token dynamically when making API calls.
+#
+# Repository placeholders: {{issue_tracker_repo_owner}}/{{issue_tracker_repo_name}}
+#
+# Common operations:
+# - List issues: GET /repos/{{issue_tracker_repo_owner}}/{{issue_tracker_repo_name}}/issues
+# - View issue: GET /repos/{{issue_tracker_repo_owner}}/{{issue_tracker_repo_name}}/issues/{{issue_id}}
+# - Create issue: POST /repos/{{issue_tracker_repo_owner}}/{{issue_tracker_repo_name}}/issues
+# - Update issue: PATCH /repos/{{issue_tracker_repo_owner}}/{{issue_tracker_repo_name}}/issues/{{issue_id}}
+# - Close issue: PATCH /repos/{{issue_tracker_repo_owner}}/{{issue_tracker_repo_name}}/issues/{{issue_id}} (set state: closed)
+#
+# Note: When repository placeholders are empty (not configured), use auto-detected repository information from Git remote.
+# """
+
+# Ticket tracker configuration
+[ticket_tracker]
+name = "github_issues"
+type = "built-in"
+method = "skill"  # Options: "cli", "mcp", "api", "skill" (default)
+description = """
+When working with support tickets:
+- To read tickets: use the "{{ticket_tracker_skill_name}}" skill
+- To respond to tickets: use the "ticket-respond-{{ticket_tracker_tool_variant}}" skill
+
+These skills provide guidance on ticket workflows, response formatting,
+and ticket system best practices.
+"""
+
+# [CLI Method]:
+# description = """
+# GitHub Issues for RFA ticket tracking (development-focused).
+# Note: For customer-facing tickets, consider using a dedicated support platform.
+# Access via 'gh issue' CLI commands.
+#
+# {{#if ticket_tracker_repo_slug}}Repository: {{ticket_tracker_repo_slug}}
+#
+# Common operations (repository configured — use --repo flag):
+# - List tickets:   gh issue list --repo {{ticket_tracker_repo_slug}}
+# - View ticket:    gh issue view {{ticket_id}} --repo {{ticket_tracker_repo_slug}}
+# - Create ticket:  gh issue create --title "..." --body "..." --repo {{ticket_tracker_repo_slug}}
+# - Update ticket:  gh issue edit {{ticket_id}} --title "..." --repo {{ticket_tracker_repo_slug}}
+# {{/if}}
+# {{#unless ticket_tracker_repo_slug}}Common operations:
+# - List tickets:   gh issue list
+# - View ticket:    gh issue view {{ticket_id}}
+# - Create ticket:  gh issue create --title "..." --body "..."
+# - Update ticket:  gh issue edit {{ticket_id}} --title "..."
+# {{/unless}}
+# """
+
+# [MCP Method]:
+# description = """
+# GitHub Issues for RFA ticket tracking (development-focused).
+# Note: For customer-facing tickets, consider using a dedicated support platform.
+# Access via GitHub MCP Server.
+# The MCP server provides tools for listing, viewing, and managing issues.
+# All authentication is handled by the MCP server configuration.
+# """
+
+# [API Method]:
+# description = """
+# GitHub Issues for RFA ticket tracking (development-focused).
+# Note: For customer-facing tickets, consider using a dedicated support platform.
+# Access via GitHub REST API.
+#
+# Authentication: API token required
+# - Environment variable: NIA_TICKET_TOKEN
+# - Scope: Read and write access to repository issues
+# - Management: User-managed; set externally before running Nia
+# - Security: Nia does not inject tokens into logs, traces, or prompts
+#
+# The Coding Agent will read this token dynamically when making API calls.
+#
+# Repository placeholders: {{ticket_tracker_repo_owner}}/{{ticket_tracker_repo_name}}
+#
+# Common operations:
+# - List tickets: GET /repos/{{ticket_tracker_repo_owner}}/{{ticket_tracker_repo_name}}/issues
+# - View ticket: GET /repos/{{ticket_tracker_repo_owner}}/{{ticket_tracker_repo_name}}/issues/{{ticket_id}}
+# - Create ticket: POST /repos/{{ticket_tracker_repo_owner}}/{{ticket_tracker_repo_name}}/issues
+# - Update ticket: PATCH /repos/{{ticket_tracker_repo_owner}}/{{ticket_tracker_repo_name}}/issues/{{ticket_id}}
+# - Close ticket: PATCH /repos/{{ticket_tracker_repo_owner}}/{{ticket_tracker_repo_name}}/issues/{{ticket_id}} (set state: closed)
+#
+# Note: When repository placeholders are empty (not configured), use auto-detected repository information from Git remote.
+# """
 
 # Code platform configuration
 [code_platform]
 name = "github"
 type = "built-in"
-method = "cli"  # Options: "cli", "mcp", "api", "local", "skill" (default)
+method = "skill"  # Options: "cli", "mcp", "api", "skill" (default)
+description = """
+When retrieving or reading pull requests from the code platform, use the "{{code_platform_skill_name}}" skill.
+This skill provides guidance on PR navigation, review status, diff inspection,
+and code platform best practices.
+"""
 
-# Ticket tracker configuration
-[ticket_tracker]
-name = "local"
-type = "built-in"
-method = "local"  # Options: "cli", "mcp", "api", "local", "skill"(default)
+# [CLI Method]:
+# description = """
+# GitHub for code hosting and collaboration.
+# Access via 'gh' CLI commands.
+#
+# {{#if code_platform_repo_slug}}Repository: {{code_platform_repo_slug}}
+#
+# Common operations (repository configured — use --repo flag):
+# - Create PR: gh pr create --title "..." --body "..." --repo {{code_platform_repo_slug}}
+# - View PR: gh pr view {{pr_id}} --repo {{code_platform_repo_slug}}
+# - List PRs: gh pr list --repo {{code_platform_repo_slug}}
+# - Review PR: gh pr review {{pr_id}} --repo {{code_platform_repo_slug}}
+# - Merge PR: gh pr merge {{pr_id}} --repo {{code_platform_repo_slug}}
+# - View repo: gh repo view --repo {{code_platform_repo_slug}}
+# {{/if}}
+# {{#unless code_platform_repo_slug}}Common operations:
+# - Create PR: gh pr create --title "..." --body "..."
+# - View PR: gh pr view {{pr_id}}
+# - List PRs: gh pr list
+# - Review PR: gh pr review {{pr_id}}
+# - Merge PR: gh pr merge {{pr_id}}
+# - View repo: gh repo view
+# {{/unless}}
+# """
+
+# [MCP Method]:
+# description = """
+# GitHub for code hosting and collaboration.
+# Access via GitHub MCP Server.
+# The MCP server provides comprehensive tools for repository operations including pull requests, code reviews, branches, and commits.
+# All authentication is handled by the MCP server configuration.
+# """
+
+# [API Method]:
+# description = """
+# GitHub for code hosting and collaboration.
+# Access via GitHub REST API.
+#
+# Authentication: API token required
+# - Environment variable: NIA_CODE_TOKEN
+# - Scope: Read and write access to repositories, pull requests, and code
+# - Management: User-managed; set externally before running Nia
+# - Security: Nia does not inject tokens into logs, traces, or prompts
+#
+# The Coding Agent will read this token dynamically when making API calls.
+#
+# Repository placeholders: {{code_platform_repo_owner}}/{{code_platform_repo_name}}
+#
+# Common operations:
+# - List PRs: GET /repos/{{code_platform_repo_owner}}/{{code_platform_repo_name}}/pulls
+# - View PR: GET /repos/{{code_platform_repo_owner}}/{{code_platform_repo_name}}/pulls/{{pr_id}}
+# - Create PR: POST /repos/{{code_platform_repo_owner}}/{{code_platform_repo_name}}/pulls
+# - Update PR: PATCH /repos/{{code_platform_repo_owner}}/{{code_platform_repo_name}}/pulls/{{pr_id}}
+# - Merge PR: PUT /repos/{{code_platform_repo_owner}}/{{code_platform_repo_name}}/pulls/{{pr_id}}/merge
+# - List commits: GET /repos/{{code_platform_repo_owner}}/{{code_platform_repo_name}}/commits
+# - Get repo: GET /repos/{{code_platform_repo_owner}}/{{code_platform_repo_name}}
+#
+# Note: When repository placeholders are empty (not configured), use auto-detected repository information from Git remote.
+# """
 
