@@ -10,7 +10,11 @@ export class MarkdownPipe implements PipeTransform {
   private sanitizer = inject(DomSanitizer);
 
   constructor() {
-    // Configure marked options for better rendering
+    this.configureMarkedOptions();
+  }
+
+  /** Configure marked options for better rendering. */
+  private configureMarkedOptions(): void {
     marked.setOptions({
       breaks: true, // Convert \n to <br>
       gfm: true, // GitHub Flavored Markdown
