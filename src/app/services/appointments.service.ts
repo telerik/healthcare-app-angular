@@ -3,6 +3,14 @@ import { getAppointmentsData, SchedulerAppointment, GridAppointment } from '../d
 
 export type { SchedulerAppointment, GridAppointment };
 
+export interface NextAppointment {
+  patientId: number;
+  time: string;
+  reason: string;
+  room: string;
+  start: Date;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -48,6 +56,37 @@ export class AppointmentsService {
         room: apt.description,
       };
     });
+  }
+
+  // Resolve the next eligible (linked, non-cancelled) appointment for today
+  public getNextAppointment(): NextAppointment | null {
+    this.ensureAppointmentsLoaded();
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const eligible = this.cachedAppointments!.filter((apt) => {
+      const aptDate = new Date(apt.start);
+      aptDate.setHours(0, 0, 0, 0);
+      const isToday = aptDate.getTime() === today.getTime();
+      const status = apt.status || (apt.cancelled ? 'Cancelled' : 'Upcoming');
+      const isEligibleStatus = status === 'In Progress' || status === 'Upcoming';
+      return isToday && apt.cancelled !== true && isEligibleStatus && apt.patientId != null;
+    });
+
+    if (eligible.length === 0) {
+      return null;
+    }
+
+    const next = [...eligible].sort((a, b) => a.start.getTime() - b.start.getTime())[0];
+
+    return {
+      patientId: next.patientId!,
+      time: this.formatTime(next.start),
+      reason: next.reason,
+      room: next.description,
+      start: next.start,
+    };
   }
 
   // Helper method

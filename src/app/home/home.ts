@@ -6,6 +6,7 @@ import {
   ViewChild,
   ViewEncapsulation,
   HostListener,
+  computed,
   signal,
   inject,
 } from '@angular/core';
@@ -43,7 +44,7 @@ import {
   stickyNoteIcon,
   xIcon,
 } from '@progress/kendo-svg-icons';
-import { PATIENTS_DATA, PatientProfile } from '../data/patients.data';
+import { PATIENTS_DATA, PatientAllergy, PatientProfile } from '../data/patients.data';
 import {
   DAILY_ALERTS,
   HOME_PATIENTS,
@@ -53,7 +54,11 @@ import {
   LabTest,
 } from '../data/home.data';
 import { MarkdownPipe } from '../pipes/markdown.pipe';
-import { AppointmentsService, GridAppointment } from '../services/appointments.service';
+import {
+  AppointmentsService,
+  GridAppointment,
+  NextAppointment,
+} from '../services/appointments.service';
 import { PageHeaderService } from '../services/page-header.service';
 
 @Component({
@@ -141,7 +146,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   public appointments: GridAppointment[] = [];
 
   // Next Patient data
-  public nextPatient: PatientProfile | null = null;
+  public nextPatient = signal<PatientProfile | null>(null);
+  public nextAppointment = signal<NextAppointment | null>(null);
 
   // Dialog states
   public clinicalNoteDialogOpened = false;
@@ -191,77 +197,38 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   public selectedAlert: DailyAlert | null = null;
 
-  // Reason for Visit data
-  public reasonForVisit = {
-    patient: 'Isabella Rossi',
-    patientId: 'P-102563',
-    appointmentDate: 'Today, 9:30 AM',
-    visitType: 'Cardiology Follow-up',
-    primaryConcern: 'Post-procedure cardiac monitoring',
-    background:
-      'Patient is scheduled for a routine cardiology follow-up appointment following a successful cardiac catheterization procedure performed 6 weeks ago. The procedure was done to evaluate coronary artery disease.',
-    previousVisits: [
-      { date: '6 weeks ago', description: 'Cardiac catheterization procedure - successful' },
-      {
-        date: '3 months ago',
-        description: 'Initial cardiology consultation - chest pain evaluation',
-      },
-      { date: '4 months ago', description: 'Stress test - abnormal results' },
-    ],
-    objectives: [
-      'Review catheterization results and discuss findings',
-      'Assess current cardiac symptoms and medication response',
-      'Evaluate ECG and recent lab work',
-      'Review lifestyle modifications and cardiac rehabilitation progress',
-      'Adjust medication dosage if necessary',
-      'Schedule next follow-up appointment',
-    ],
-    preparationNotes: [
-      'Review patient chart and catheterization report',
-      'Have recent ECG and lab results available',
-      'Prepare medication adjustment options if needed',
-    ],
-  };
+  // Reason for Visit — derived from the current next patient, never stored separately
+  public reasonForVisit = computed(() => {
+    const patient = this.nextPatient();
+    const visit = patient?.visitReason;
+    if (!patient || !visit) {
+      return null;
+    }
+    return {
+      patient: patient.name,
+      patientId: patient.patientCode,
+      appointmentDate: this.nextAppointment()?.time ?? '',
+      ...visit,
+    };
+  });
 
-  // Allergy Alert data
-  public allergyAlert = {
-    patient: 'Isabella Rossi',
-    patientId: 'P-102563',
-    allergen: 'Penicillin',
-    allergyType: 'Drug Allergy',
-    severity: 'Severe',
-    reaction: 'Anaphylaxis',
-    firstReported: 'March 2018',
-    symptoms: [
-      'Difficulty breathing and wheezing',
-      'Severe skin rash and hives',
-      'Swelling of face, lips, and throat',
-      'Rapid pulse and dizziness',
-      'Loss of consciousness (reported in initial episode)',
-    ],
-    crossReactivities: [
-      'Amoxicillin',
-      'Ampicillin',
-      'Other beta-lactam antibiotics',
-      'Possibly cephalosporins (use with caution)',
-    ],
-    safeAlternatives: [
-      'Fluoroquinolones (e.g., Levofloxacin, Ciprofloxacin)',
-      'Macrolides (e.g., Azithromycin, Clarithromycin)',
-      'Tetracyclines (e.g., Doxycycline)',
-      'Vancomycin for severe infections',
-    ],
-    emergencyProtocol: [
-      'Immediately discontinue any suspected beta-lactam antibiotic',
-      'Administer epinephrine 0.3-0.5mg IM if anaphylaxis symptoms appear',
-      'Administer antihistamines (Diphenhydramine 50mg)',
-      'Provide oxygen support and monitor vital signs',
-      'Call emergency response team',
-      'Be prepared for potential intubation if airway compromised',
-    ],
-    notes:
-      'Patient carries EpiPen at all times. Family members are trained in emergency response. Allergy documented in all medical records and patient wears medical alert bracelet.',
-  };
+  public hasVisitReason = computed(() => this.reasonForVisit() !== null);
+
+  // Allergy Alert — derived from the current next patient, sorted most severe first
+  public allergyAlerts = computed<PatientAllergy[]>(() => {
+    const patient = this.nextPatient();
+    if (!patient?.allergies?.length) {
+      return [];
+    }
+    const severityRank: Record<string, number> = { Severe: 0, Moderate: 1, Mild: 2 };
+    return [...patient.allergies].sort(
+      (a, b) => severityRank[a.severity] - severityRank[b.severity],
+    );
+  });
+
+  public hasAllergyData = computed(() => this.allergyAlerts().length > 0);
+  public allergyPatientName = computed(() => this.nextPatient()?.name ?? '');
+  public allergyPatientCode = computed(() => this.nextPatient()?.patientCode ?? '');
 
   // Clinical Note Dialog data
   public patients: HomePatient[] = [...HOME_PATIENTS];
@@ -303,8 +270,9 @@ Dr. Carter`;
     this.pageHeaderService.subtitle.set('Today is ' + this.currentDate);
     this.appointments = this.appointmentsService.getTodaysAppointments();
 
-    // Set next patient to Isabella Rossi (id: 3)
-    this.nextPatient = PATIENTS_DATA.find((p) => p.id === 3) || null;
+    const next = this.appointmentsService.getNextAppointment();
+    this.nextAppointment.set(next);
+    this.nextPatient.set(next ? (PATIENTS_DATA.find((p) => p.id === next.patientId) ?? null) : null);
   }
 
   ngOnDestroy(): void {
@@ -407,6 +375,9 @@ Dr. Carter`;
 
   // Reason for Visit dialog methods
   public openReasonForVisitDialog(): void {
+    if (!this.hasVisitReason()) {
+      return;
+    }
     this.reasonForVisitDialogOpened = true;
   }
 
@@ -416,6 +387,9 @@ Dr. Carter`;
 
   // Allergy Alert dialog methods
   public openAllergyAlertDialog(): void {
+    if (!this.nextPatient()) {
+      return;
+    }
     this.allergyAlertDialogOpened = true;
   }
 
@@ -471,6 +445,8 @@ Free-text queries are not supported in this preview. In your production app, con
       let responseText: string;
 
       if (suggestion.id === 1) {
+        // TODO(BUG-02-followup): canned responses below still hardcode a fixed patient.
+        // Out of scope for issue #13 (see issue section 7); track separately.
         // "Summary for next patient" - return hardcoded value
         responseText = `📋 **Next Patient Summary**
 

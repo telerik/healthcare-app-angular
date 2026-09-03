@@ -8,6 +8,8 @@ export interface SchedulerAppointment {
   striped: boolean;
   cancelled?: boolean;
   status?: 'Complete' | 'In Progress' | 'Upcoming' | 'Cancelled';
+  /** id of the matching PATIENTS_DATA record, when one exists. */
+  patientId?: number;
 }
 
 export interface GridAppointment {
@@ -36,6 +38,7 @@ export function getAppointmentsData(): SchedulerAppointment[] {
       striped: false,
       cancelled: false,
       status: 'Complete' as const,
+      patientId: 2,
     },
     {
       id: 2,
@@ -91,6 +94,7 @@ export function getAppointmentsData(): SchedulerAppointment[] {
       striped: false,
       cancelled: false,
       status: 'Upcoming' as const,
+      patientId: 3,
     },
     {
       id: 7,
@@ -211,6 +215,7 @@ export function getAppointmentsData(): SchedulerAppointment[] {
       description: '101 (Floor 1)',
       striped: false,
       cancelled: false,
+      patientId: 8,
     },
     {
       id: 18,
