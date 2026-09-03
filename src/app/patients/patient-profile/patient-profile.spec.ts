@@ -1,35 +1,37 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { PatientProfileComponent } from './patient-profile';
 import { PatientsService } from '../../services/patients.service';
+import { PatientProfile } from '../../data/patients.data';
 import { PageHeaderService } from '../../services/page-header.service';
 
 describe('PatientProfileComponent', () => {
   let component: PatientProfileComponent;
   let fixture: ComponentFixture<PatientProfileComponent>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockPatientsService: jasmine.SpyObj<PatientsService>;
-  let mockPageHeaderService: jasmine.SpyObj<PageHeaderService>;
-  let mockActivatedRoute: any;
+  let mockRouter: { navigate: ReturnType<typeof vi.fn> };
+  let mockPatientsService: { getPatientById: ReturnType<typeof vi.fn> };
+  let mockPageHeaderService: { title: { set: ReturnType<typeof vi.fn> }; subtitle: { set: ReturnType<typeof vi.fn> } };
+  let mockActivatedRoute: { paramMap: Observable<Map<string, string>> };
 
   beforeEach(() => {
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-    mockPatientsService = jasmine.createSpyObj('PatientsService', ['getPatientById']);
+    mockRouter = { navigate: vi.fn() };
+    mockPatientsService = { getPatientById: vi.fn() };
     mockPageHeaderService = {
-      title: { set: jasmine.createSpy('set') },
-      subtitle: { set: jasmine.createSpy('set') },
-    } as any;
+      title: { set: vi.fn() },
+      subtitle: { set: vi.fn() },
+    };
     mockActivatedRoute = {
-      paramMap: of(new Map()),
+      paramMap: of(new Map<string, string>()),
     };
 
     TestBed.configureTestingModule({
       imports: [PatientProfileComponent],
       providers: [
-        { provide: Router, useValue: mockRouter },
-        { provide: PatientsService, useValue: mockPatientsService },
-        { provide: PageHeaderService, useValue: mockPageHeaderService },
+        { provide: Router, useValue: mockRouter as unknown as Router },
+        { provide: PatientsService, useValue: mockPatientsService as unknown as PatientsService },
+        { provide: PageHeaderService, useValue: mockPageHeaderService as unknown as PageHeaderService },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
       ],
     });
@@ -43,7 +45,7 @@ describe('PatientProfileComponent', () => {
   });
 
   it('should navigate to /patients when patientId is NaN', () => {
-    const consoleErrorSpy = spyOn(console, 'error');
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     component.patientId = NaN;
     component['loadPatientData']();
 
@@ -65,9 +67,9 @@ describe('PatientProfileComponent', () => {
       id: 1,
       name: 'Test Patient',
       labResults: [],
-    } as any;
+    } as unknown as PatientProfile;
 
-    mockPatientsService.getPatientById.and.returnValue(mockPatient);
+    mockPatientsService.getPatientById.mockReturnValue(mockPatient);
     component.patientId = 1;
     component['loadPatientData']();
 
@@ -76,7 +78,7 @@ describe('PatientProfileComponent', () => {
   });
 
   it('should navigate to /patients when patient not found', () => {
-    mockPatientsService.getPatientById.and.returnValue(null);
+    mockPatientsService.getPatientById.mockReturnValue(null);
     component.patientId = 999;
     component['loadPatientData']();
 
