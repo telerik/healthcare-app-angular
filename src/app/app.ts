@@ -206,10 +206,9 @@ export class App implements OnInit {
   private patientsService = inject(PatientsService);
 
   constructor() {
-    // Set initial selected nav based on current route
-    this.updateSelectedNavFromRoute();
     // Load patients data for combobox
     this.patients = this.patientsService.getAllPatients();
+    this.updateSelectedNavFromRoute(this.getBrowserRoute());
   }
 
   ngOnInit(): void {
@@ -217,7 +216,7 @@ export class App implements OnInit {
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe(() => {
-        this.updateSelectedNavFromRoute();
+        this.updateSelectedNavFromRoute(this.router.url);
       });
   }
 
@@ -251,10 +250,14 @@ export class App implements OnInit {
     this.router.navigate([item.route]);
   }
 
+  private getBrowserRoute(): string {
+    const hashRoute = window.location.hash.slice(1);
+    return hashRoute || '/';
+  }
+
   // Update selected nav index based on current route
-  private updateSelectedNavFromRoute(): void {
+  private updateSelectedNavFromRoute(currentRoute: string): void {
     const routes = ['/', '/schedule', '/patients', '/analytics'];
-    const currentRoute = this.router.url;
     const index = routes.findIndex((route) =>
       route === '/' ? currentRoute === '/' : currentRoute.startsWith(route),
     );

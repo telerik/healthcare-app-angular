@@ -28,6 +28,39 @@ export interface PatientProfile extends Patient {
   };
   notes: string;
   labResults: LabResult[];
+  allergies?: PatientAllergy[];
+  visitReason?: VisitReason;
+}
+
+export type AllergySeverity = 'Severe' | 'Moderate' | 'Mild';
+
+export interface PatientAllergy {
+  allergen: string;
+  allergyType: string;
+  severity: AllergySeverity;
+  reaction: string;
+  firstReported: string;
+  symptoms: string[];
+  crossReactivities: string[];
+  safeAlternatives: string[];
+  emergencyProtocol: string[];
+  notes: string;
+}
+
+export interface PatientVisit {
+  date: string;
+  description: string;
+}
+
+// Deliberately excludes patient/patientId/appointmentDate: identity comes from
+// PatientProfile.name / PatientProfile.patientCode, and timing from the appointment.
+export interface VisitReason {
+  visitType: string;
+  primaryConcern: string;
+  background: string;
+  previousVisits: PatientVisit[];
+  objectives: string[];
+  preparationNotes: string[];
 }
 
 export interface LabResult {
@@ -376,6 +409,26 @@ export const PATIENTS_DATA: PatientProfile[] = [
         notes: 'Slightly low, supplementation recommended',
       },
     ],
+    visitReason: {
+      visitType: 'Diabetes Management Follow-up',
+      primaryConcern: 'Glycemic control reassessment following medication adjustment',
+      background:
+        'Patient is scheduled for a follow-up visit after recent adjustment of metformin dosage and addition of long-acting insulin due to poorly controlled Type 2 diabetes (HbA1c 8.2%).',
+      previousVisits: [
+        { date: '2 weeks ago', description: 'Diabetes education and medication adjustment' },
+        { date: '3 months ago', description: 'Routine diabetes follow-up - HbA1c elevated' },
+      ],
+      objectives: [
+        'Review blood glucose logs and medication adherence',
+        'Assess response to insulin and metformin adjustment',
+        'Reinforce dietary and lifestyle modifications',
+        'Screen for signs of hypoglycemia or medication side effects',
+      ],
+      preparationNotes: [
+        'Review patient chart and recent glucose monitoring logs',
+        'Have latest HbA1c and fasting glucose results available',
+      ],
+    },
   },
   {
     id: 3,
@@ -543,6 +596,94 @@ export const PATIENTS_DATA: PatientProfile[] = [
         referenceRange: '<2.0',
         status: 'Stable',
         notes: 'Normal tissue perfusion',
+      },
+    ],
+    visitReason: {
+      visitType: 'Cardiology Follow-up',
+      primaryConcern: 'Post-procedure cardiac monitoring',
+      background:
+        'Patient is scheduled for a routine cardiology follow-up appointment following a successful cardiac catheterization procedure performed 6 weeks ago. The procedure was done to evaluate coronary artery disease.',
+      previousVisits: [
+        { date: '6 weeks ago', description: 'Cardiac catheterization procedure - successful' },
+        {
+          date: '3 months ago',
+          description: 'Initial cardiology consultation - chest pain evaluation',
+        },
+        { date: '4 months ago', description: 'Stress test - abnormal results' },
+      ],
+      objectives: [
+        'Review catheterization results and discuss findings',
+        'Assess current cardiac symptoms and medication response',
+        'Evaluate ECG and recent lab work',
+        'Review lifestyle modifications and cardiac rehabilitation progress',
+        'Adjust medication dosage if necessary',
+        'Schedule next follow-up appointment',
+      ],
+      preparationNotes: [
+        'Review patient chart and catheterization report',
+        'Have recent ECG and lab results available',
+        'Prepare medication adjustment options if needed',
+      ],
+    },
+    allergies: [
+      {
+        allergen: 'Penicillin',
+        allergyType: 'Drug Allergy',
+        severity: 'Severe',
+        reaction: 'Anaphylaxis',
+        firstReported: 'March 2018',
+        symptoms: [
+          'Difficulty breathing and wheezing',
+          'Severe skin rash and hives',
+          'Swelling of face, lips, and throat',
+          'Rapid pulse and dizziness',
+          'Loss of consciousness (reported in initial episode)',
+        ],
+        crossReactivities: [
+          'Amoxicillin',
+          'Ampicillin',
+          'Other beta-lactam antibiotics',
+          'Possibly cephalosporins (use with caution)',
+        ],
+        safeAlternatives: [
+          'Fluoroquinolones (e.g., Levofloxacin, Ciprofloxacin)',
+          'Macrolides (e.g., Azithromycin, Clarithromycin)',
+          'Tetracyclines (e.g., Doxycycline)',
+          'Vancomycin for severe infections',
+        ],
+        emergencyProtocol: [
+          'Immediately discontinue any suspected beta-lactam antibiotic',
+          'Administer epinephrine 0.3-0.5mg IM if anaphylaxis symptoms appear',
+          'Administer antihistamines (Diphenhydramine 50mg)',
+          'Provide oxygen support and monitor vital signs',
+          'Call emergency response team',
+          'Be prepared for potential intubation if airway compromised',
+        ],
+        notes:
+          'Patient carries EpiPen at all times. Family members are trained in emergency response. Allergy documented in all medical records and patient wears medical alert bracelet.',
+      },
+      {
+        allergen: 'Latex',
+        allergyType: 'Contact Allergy',
+        severity: 'Moderate',
+        reaction: 'Contact dermatitis',
+        firstReported: 'January 2021',
+        symptoms: [
+          'Localized skin redness and itching',
+          'Hives at site of contact',
+          'Mild swelling',
+        ],
+        crossReactivities: ['Certain tropical fruits (banana, avocado, kiwi) - low risk'],
+        safeAlternatives: [
+          'Nitrile or vinyl gloves',
+          'Latex-free medical adhesives and tape',
+        ],
+        emergencyProtocol: [
+          'Remove latex source and wash affected area',
+          'Apply topical antihistamine or corticosteroid cream as needed',
+          'Monitor for escalation to systemic symptoms',
+        ],
+        notes: 'Ensure all staff use latex-free gloves and equipment during patient contact.',
       },
     ],
   },

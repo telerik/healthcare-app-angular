@@ -1,6 +1,6 @@
-import { inject, Pipe, PipeTransform } from '@angular/core';
+import { inject, Pipe, PipeTransform, SecurityContext } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { marked } from 'marked';
+import { Marked } from 'marked';
 
 @Pipe({
   name: 'markdown',
@@ -9,13 +9,11 @@ import { marked } from 'marked';
 export class MarkdownPipe implements PipeTransform {
   private sanitizer = inject(DomSanitizer);
 
-  constructor() {
-    // Configure marked options for better rendering
-    marked.setOptions({
-      breaks: true, // Convert \n to <br>
-      gfm: true, // GitHub Flavored Markdown
-    });
-  }
+  // Create a local instance with options instead of modifying global state
+  private readonly marked = new Marked({
+    breaks: true,
+    gfm: true,
+  });
 
   transform(value: string | undefined): SafeHtml {
     if (!value) {
@@ -23,8 +21,8 @@ export class MarkdownPipe implements PipeTransform {
     }
 
     try {
-      const html = marked.parse(value);
-      return this.sanitizer.sanitize(1, html) || '';
+      const html = this.marked.parse(value);
+      return this.sanitizer.sanitize(SecurityContext.HTML, html) || '';
     } catch (error) {
       console.error('Markdown parsing error:', error);
       return value;
