@@ -1,0 +1,39 @@
+@if (recommendations.length) {
+  <kendo-card
+    class="recommendation-card"
+    width="100%"
+    role="region"
+    aria-label="Recommended next actions"
+  >
+    <kendo-card-body>
+      <div class="recommendation-header">
+        <kendo-svgicon [icon]="sparklesIcon" size="medium"></kendo-svgicon>
+        <h3 class="recommendation-title">Recommended next actions</h3>
+      </div>
+      <p class="recommendation-subtitle">
+        @if (hasUrgentActions) {
+          Suggested steps based on this patient's current record.
+        } @else {
+          No urgent actions — routine follow-up only.
+        }
+      </p>
+      <ul class="recommendation-list">
+        @for (recommendation of recommendations; track recommendation.id) {
+          <li class="recommendation-item">
+            <button
+              kendoButton
+              rounded="full"
+              [themeColor]="recommendation.urgency === 'high' ? 'primary' : 'base'"
+              [attr.data-action-id]="recommendation.id"
+              [attr.aria-label]="recommendation.label + '. ' + recommendation.reason"
+              (click)="onActionClick(recommendation.id)"
+            >
+              {{ recommendation.label }}
+            </button>
+            <span class="recommendation-reason">{{ recommendation.reason }}</span>
+          </li>
+        }
+      </ul>
+    </kendo-card-body>
+  </kendo-card>
+}
