@@ -40,4 +40,54 @@ describe('PatientsService', () => {
     expect(updated).toBe(true);
     expect(profile?.notes).toBe('Dummy test notes');
   });
+
+  describe('getRecommendations', () => {
+    it('returns an empty recommendation list for an unknown patient', () => {
+      expect(service.getRecommendations(-1)).toEqual([]);
+    });
+
+    it('returns the three core actions for a valid patient', () => {
+      const existingPatient = service.getAllPatients()[0];
+      const recommendations = service.getRecommendations(existingPatient.id);
+
+      expect(recommendations.map((r) => r.id)).toEqual([
+        'review-vitals',
+        'request-lab',
+        'schedule-follow-up',
+      ]);
+    });
+
+    it('flags vitals review as high urgency for a critical patient', () => {
+      const criticalPatient = service.getAllPatients().find((p) => p.status === 'Critical');
+      if (!criticalPatient) {
+        return;
+      }
+
+      const recommendations = service.getRecommendations(criticalPatient.id);
+      const reviewVitals = recommendations.find((r) => r.id === 'review-vitals');
+
+      expect(reviewVitals?.urgency).toBe('high');
+    });
+
+    it('marks follow-up as normal urgency for a stable patient', () => {
+      const stablePatient = service.getAllPatients().find((p) => p.status === 'Stable');
+      if (!stablePatient) {
+        return;
+      }
+
+      const recommendations = service.getRecommendations(stablePatient.id);
+      const followUp = recommendations.find((r) => r.id === 'schedule-follow-up');
+
+      expect(followUp?.urgency).toBe('normal');
+    });
+
+    it('includes a non-empty reason for every recommendation', () => {
+      const existingPatient = service.getAllPatients()[0];
+      const recommendations = service.getRecommendations(existingPatient.id);
+
+      recommendations.forEach((recommendation) => {
+        expect(recommendation.reason.length).toBeGreaterThan(0);
+      });
+    });
+  });
 });
