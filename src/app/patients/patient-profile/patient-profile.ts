@@ -167,7 +167,8 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
       return;
     }
     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    element.focus();
+    // preventScroll avoids focus() cancelling/jump-cutting the smooth scroll above
+    element.focus({ preventScroll: true });
     this.isVitalsHighlighted = true;
     clearTimeout(this.vitalsHighlightTimeout);
     this.vitalsHighlightTimeout = setTimeout(() => (this.isVitalsHighlighted = false), 2000);
