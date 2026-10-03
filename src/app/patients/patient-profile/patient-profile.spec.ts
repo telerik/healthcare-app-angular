@@ -114,7 +114,7 @@ describe('PatientProfileComponent', () => {
     component.onRecommendationAction('review-vitals' as RecommendationActionId);
 
     expect(scrollIntoView).toHaveBeenCalled();
-    expect(focus).toHaveBeenCalled();
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
     expect(component.isVitalsHighlighted).toBe(true);
 
     vi.advanceTimersByTime(2000);
