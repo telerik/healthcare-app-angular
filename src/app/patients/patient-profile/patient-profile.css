@@ -21,7 +21,7 @@
 .k-breadcrumb-last-item .k-breadcrumb-link,
 .k-breadcrumb-last-item .k-breadcrumb-link:hover,
 .k-breadcrumb-last-item .k-breadcrumb-link:focus {
-  color:#3f3d40;
+  color: #3f3d40;
 }
 
 /* Page Actions */
@@ -192,6 +192,17 @@
 
 .vital-alert {
   color: #f31700;
+}
+
+.vitals-highlight {
+  outline: 2px solid var(--kendo-color-primary, #ff6358);
+  outline-offset: 2px;
+  transition: outline-color 0.3s ease-in-out;
+}
+
+app-recommendation-panel {
+  display: block;
+  width: 100%;
 }
 
 /* Patient Note Card */

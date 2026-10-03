@@ -1,15 +1,13 @@
 <section class="page-section">
   <div class="page-header">
     <div>
-      <kendo-breadcrumb [items]="breadcrumbItems" (itemClick)="onBreadcrumbItemClick($event)"></kendo-breadcrumb>
+      <kendo-breadcrumb
+        [items]="breadcrumbItems"
+        (itemClick)="onBreadcrumbItemClick($event)"
+      ></kendo-breadcrumb>
     </div>
     <div class="page-actions">
-      <button
-        kendoButton
-        rounded="full"
-        [svgIcon]="downloadIcon"
-        (click)="exportToExcel()"
-      >
+      <button kendoButton rounded="full" [svgIcon]="downloadIcon" (click)="exportToExcel()">
         Export
       </button>
     </div>
@@ -55,7 +53,13 @@
       </kendo-card>
 
       <!-- Recent Vitals Card -->
-      <kendo-card class="profile-card" width="100%">
+      <kendo-card
+        #vitalsCard
+        class="profile-card"
+        width="100%"
+        tabindex="-1"
+        [class.vitals-highlight]="isVitalsHighlighted"
+      >
         <div class="vitals-content">
           <div class="vitals-container">
             <h3 class="vitals-title">Recent Vitals</h3>
@@ -112,6 +116,11 @@
         </div>
       </kendo-card>
     </div>
+
+    <app-recommendation-panel
+      [recommendations]="recommendations"
+      (actionSelected)="onRecommendationAction($event)"
+    ></app-recommendation-panel>
   }
 
   <!-- Patient Note Editor -->
@@ -177,4 +186,16 @@
       </kendo-grid>
     </kendo-card-body>
   </kendo-card>
+
+  @if (isLabDialogOpen) {
+    <kendo-dialog title="Request lab" (close)="closeLabDialog()" [minWidth]="300" [width]="450">
+      <p>
+        Lab ordering is not available in this demo application. In a production system this would
+        open the lab request form for {{ patient?.name }}.
+      </p>
+      <kendo-dialog-actions>
+        <button kendoButton themeColor="primary" (click)="closeLabDialog()">Close</button>
+      </kendo-dialog-actions>
+    </kendo-dialog>
+  }
 </section>

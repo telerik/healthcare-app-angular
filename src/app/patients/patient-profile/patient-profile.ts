@@ -1,7 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation, inject } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  ViewEncapsulation,
+  inject,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChipThemeColor, KENDO_BUTTONS } from '@progress/kendo-angular-buttons';
+import { KENDO_DIALOG } from '@progress/kendo-angular-dialog';
 import { EditorCssSettings, KENDO_EDITOR } from '@progress/kendo-angular-editor';
 import { ExcelExportData } from '@progress/kendo-angular-excel-export';
 import { GridComponent, KENDO_GRID, KENDO_GRID_EXCEL_EXPORT } from '@progress/kendo-angular-grid';
@@ -14,10 +23,17 @@ import { KENDO_TOOLBAR } from '@progress/kendo-angular-toolbar';
 
 import { SortDescriptor } from '@progress/kendo-data-query';
 import { downloadIcon, homeIcon, sparklesIcon, SVGIcon, userIcon } from '@progress/kendo-svg-icons';
+import { Subscription } from 'rxjs';
 
-import { LabResult, PatientProfile } from '../../data/patients.data';
+import {
+  LabResult,
+  PatientProfile,
+  PatientRecommendation,
+  RecommendationActionId,
+} from '../../data/patients.data';
 import { PageHeaderService } from '../../services/page-header.service';
 import { PatientsService } from '../../services/patients.service';
+import { RecommendationPanelComponent } from './recommendation-panel/recommendation-panel';
 
 @Component({
   selector: 'app-patient-profile',
@@ -29,6 +45,7 @@ import { PatientsService } from '../../services/patients.service';
     CommonModule,
     KENDO_BREADCRUMB,
     KENDO_BUTTONS,
+    KENDO_DIALOG,
     KENDO_ICONS,
     KENDO_INDICATORS,
     KENDO_LAYOUT,
@@ -37,10 +54,12 @@ import { PatientsService } from '../../services/patients.service';
     KENDO_GRID,
     KENDO_GRID_EXCEL_EXPORT,
     KENDO_PAGER,
+    RecommendationPanelComponent,
   ],
 })
 export class PatientProfileComponent implements OnInit, OnDestroy {
   @ViewChild(GridComponent) private grid!: GridComponent;
+  @ViewChild('vitalsCard', { read: ElementRef }) private vitalsCard?: ElementRef<HTMLElement>;
 
   public downloadIcon: SVGIcon = downloadIcon;
   public sparklesIcon: SVGIcon = sparklesIcon;
@@ -72,6 +91,13 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
   public labResults: LabResult[] = [];
   public labResultsSort: SortDescriptor[] = [{ field: 'testName', dir: 'asc' }];
 
+  public recommendations: PatientRecommendation[] = [];
+  public isVitalsHighlighted = false;
+  public isLabDialogOpen = false;
+
+  private vitalsHighlightTimeout?: ReturnType<typeof setTimeout>;
+  private routeSub?: Subscription;
+
   private pageHeaderService = inject(PageHeaderService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -82,7 +108,7 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
     this.pageHeaderService.subtitle.set('');
 
     // Subscribe to route parameter changes to handle navigation between different patients
-    this.route.paramMap.subscribe((params) => {
+    this.routeSub = this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       if (id) {
         this.patientId = parseInt(id, 10);
@@ -94,17 +120,57 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.pageHeaderService.title.set('');
     this.pageHeaderService.subtitle.set('');
+    clearTimeout(this.vitalsHighlightTimeout);
+    this.routeSub?.unsubscribe();
   }
 
   private loadPatientData(): void {
+    // Reset per-patient UI state so nothing leaks across rapid patient switches
+    this.isVitalsHighlighted = false;
+    this.isLabDialogOpen = false;
+
     const patientData = this.patientsService.getPatientById(this.patientId);
     if (patientData) {
       this.patient = patientData;
       this.labResults = patientData.labResults;
+      this.recommendations = this.patientsService.getRecommendations(this.patientId);
     } else {
       // Patient not found, navigate back to patients list
+      this.recommendations = [];
       this.router.navigate(['/patients']);
     }
+  }
+
+  public onRecommendationAction(actionId: RecommendationActionId): void {
+    switch (actionId) {
+      case 'review-vitals':
+        this.focusVitals();
+        break;
+      case 'request-lab':
+        this.isLabDialogOpen = true;
+        break;
+      case 'schedule-follow-up':
+        this.router.navigate(['/schedule'], {
+          queryParams: { patientId: this.patientId, patientName: this.patient?.name },
+        });
+        break;
+    }
+  }
+
+  public closeLabDialog(): void {
+    this.isLabDialogOpen = false;
+  }
+
+  private focusVitals(): void {
+    const element = this.vitalsCard?.nativeElement;
+    if (!element) {
+      return;
+    }
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    element.focus();
+    this.isVitalsHighlighted = true;
+    clearTimeout(this.vitalsHighlightTimeout);
+    this.vitalsHighlightTimeout = setTimeout(() => (this.isVitalsHighlighted = false), 2000);
   }
 
   public navigateToPatients(): void {
