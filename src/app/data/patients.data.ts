@@ -38,6 +38,17 @@ export interface LabResult {
   notes: string;
 }
 
+export type RecommendationActionId = 'review-vitals' | 'request-lab' | 'schedule-follow-up';
+
+export type RecommendationUrgency = 'high' | 'normal';
+
+export interface PatientRecommendation {
+  id: RecommendationActionId;
+  label: string;
+  reason: string;
+  urgency: RecommendationUrgency;
+}
+
 export const PATIENTS_DATA: PatientProfile[] = [
   {
     id: 1,
