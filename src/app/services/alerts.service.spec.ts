@@ -165,4 +165,22 @@ describe('AlertsService', () => {
     const state = service.getCaseState(9999);
     expect(state).toBe('Open');
   });
+
+  it('should allow re-opening a resolved alert', () => {
+    service.setCaseState(1, 'Resolved');
+    expect(service.getCaseState(1)).toBe('Resolved');
+
+    service.setCaseState(1, 'Open');
+    expect(service.getCaseState(1)).toBe('Open');
+
+    const alert = service.alerts().find((a) => a.id === 1);
+    expect(alert?.caseState).toBe('Open');
+
+    const stored = localStorage.getItem('healthcare-alerts-case-state');
+    expect(stored).toBeTruthy();
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      expect(parsed['1']).toBe('Open');
+    }
+  });
 });
