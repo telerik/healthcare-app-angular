@@ -76,6 +76,7 @@ describe('AlertsService', () => {
   });
 
   it('should filter alerts by state', () => {
+    const totalAlerts = service.alerts().length;
     service.setCaseState(1, 'In Progress');
     service.setCaseState(2, 'In Progress');
     service.setCaseState(3, 'Resolved');
@@ -89,7 +90,11 @@ describe('AlertsService', () => {
     expect(resolvedAlerts[0].caseState).toBe('Resolved');
 
     const openAlerts = service.getFilteredAlerts('Open');
-    expect(openAlerts.length).toBeGreaterThan(0);
+    expect(openAlerts.length).toBe(totalAlerts - 3);
+    expect(openAlerts.every((alert) => alert.caseState === 'Open')).toBe(true);
+    expect(openAlerts.some((alert) => alert.id === 1 || alert.id === 2 || alert.id === 3)).toBe(
+      false,
+    );
   });
 
   it('should return all alerts when filter is "All"', () => {
