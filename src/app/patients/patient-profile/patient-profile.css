@@ -221,6 +221,35 @@
   align-items: center;
 }
 
+.note-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.note-save-status {
+  display: flex;
+  align-items: center;
+  min-height: 20px;
+}
+
+.note-save-status__content {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 150%;
+}
+
+.note-save-status__content--success {
+  color: #1b5e20;
+}
+
+.note-save-status__content--error {
+  color: #b3261e;
+}
+
 .note-title,
 .lab-results-title {
   margin: 0;

@@ -119,14 +119,32 @@
     <kendo-card-body>
       <div class="note-header">
         <h3 class="note-title">Patient Note</h3>
-        <button kendoButton rounded="full" (click)="saveNotes()">
-          <kendo-svgicon [icon]="downloadIcon" size="small"></kendo-svgicon>
-          Save
-        </button>
+        <div class="note-actions">
+          <div class="note-save-status" role="status" aria-live="polite">
+            @if (noteStatus() !== 'idle') {
+              <span
+                class="note-save-status__content"
+                [class.note-save-status__content--success]="noteStatus() === 'success'"
+                [class.note-save-status__content--error]="noteStatus() === 'error'"
+              >
+                <kendo-svgicon
+                  [icon]="noteStatus() === 'success' ? noteSuccessIcon : noteErrorIcon"
+                  size="small"
+                ></kendo-svgicon>
+                {{ noteStatusMessage() }}
+              </span>
+            }
+          </div>
+          <button kendoButton rounded="full" [disabled]="isSavingNote()" (click)="saveNotes()">
+            <kendo-svgicon [icon]="downloadIcon" size="small"></kendo-svgicon>
+            Save
+          </button>
+        </div>
       </div>
       <kendo-editor
         class="patient-note-editor"
-        [value]="patient?.notes || ''"
+        [value]="noteDraft()"
+        (valueChange)="onNoteValueChange($event)"
         [style.height.px]="250"
         [iframeCss]="editorIframeCss"
       >

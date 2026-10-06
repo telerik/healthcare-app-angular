@@ -1,5 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation, inject } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  ViewEncapsulation,
+  inject,
+  signal,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChipThemeColor, KENDO_BUTTONS } from '@progress/kendo-angular-buttons';
 import { EditorCssSettings, KENDO_EDITOR } from '@progress/kendo-angular-editor';
@@ -13,11 +21,21 @@ import { KENDO_PAGER } from '@progress/kendo-angular-pager';
 import { KENDO_TOOLBAR } from '@progress/kendo-angular-toolbar';
 
 import { SortDescriptor } from '@progress/kendo-data-query';
-import { downloadIcon, homeIcon, sparklesIcon, SVGIcon, userIcon } from '@progress/kendo-svg-icons';
+import {
+  checkCircleIcon,
+  downloadIcon,
+  exclamationCircleIcon,
+  homeIcon,
+  sparklesIcon,
+  SVGIcon,
+  userIcon,
+} from '@progress/kendo-svg-icons';
 
 import { LabResult, PatientProfile } from '../../data/patients.data';
 import { PageHeaderService } from '../../services/page-header.service';
 import { PatientsService } from '../../services/patients.service';
+
+export type NoteSaveStatus = 'idle' | 'success' | 'error';
 
 @Component({
   selector: 'app-patient-profile',
@@ -44,6 +62,8 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
 
   public downloadIcon: SVGIcon = downloadIcon;
   public sparklesIcon: SVGIcon = sparklesIcon;
+  public noteSuccessIcon: SVGIcon = checkCircleIcon;
+  public noteErrorIcon: SVGIcon = exclamationCircleIcon;
 
   public editorIframeCss: EditorCssSettings = {
     path: 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap',
@@ -72,6 +92,14 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
   public labResults: LabResult[] = [];
   public labResultsSort: SortDescriptor[] = [{ field: 'testName', dir: 'asc' }];
 
+  public noteDraft = signal<string>('');
+  public isSavingNote = signal<boolean>(false);
+  public noteStatus = signal<NoteSaveStatus>('idle');
+  public noteStatusMessage = signal<string>('');
+
+  private noteStatusTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private static readonly NOTE_STATUS_TIMEOUT_MS = 4000;
+
   private pageHeaderService = inject(PageHeaderService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -94,6 +122,7 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.pageHeaderService.title.set('');
     this.pageHeaderService.subtitle.set('');
+    this.clearNoteStatusTimeout();
   }
 
   private loadPatientData(): void {
@@ -101,8 +130,14 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
     if (patientData) {
       this.patient = patientData;
       this.labResults = patientData.labResults;
+      this.noteDraft.set(patientData.notes ?? '');
+      this.clearNoteStatus();
     } else {
-      // Patient not found, navigate back to patients list
+      // Patient not found, clear view state and navigate back to patients list
+      this.patient = null;
+      this.labResults = [];
+      this.noteDraft.set('');
+      this.clearNoteStatus();
       this.router.navigate(['/patients']);
     }
   }
@@ -117,9 +152,59 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
     }
   }
 
+  public onNoteValueChange(value: string): void {
+    this.noteDraft.set(value ?? '');
+  }
+
+  private setNoteStatus(status: NoteSaveStatus, message: string): void {
+    this.clearNoteStatusTimeout();
+    this.noteStatus.set(status);
+    this.noteStatusMessage.set(message);
+    this.noteStatusTimeoutId = setTimeout(() => {
+      this.clearNoteStatus();
+    }, PatientProfileComponent.NOTE_STATUS_TIMEOUT_MS);
+  }
+
+  private clearNoteStatus(): void {
+    this.clearNoteStatusTimeout();
+    this.noteStatus.set('idle');
+    this.noteStatusMessage.set('');
+  }
+
+  private clearNoteStatusTimeout(): void {
+    if (this.noteStatusTimeoutId !== null) {
+      clearTimeout(this.noteStatusTimeoutId);
+      this.noteStatusTimeoutId = null;
+    }
+  }
+
   public saveNotes(): void {
-    console.log('Saving patient notes...');
-    // In a real app, save to backend service
+    if (this.isSavingNote()) {
+      return;
+    }
+
+    const targetPatientId = this.patientId;
+    const notesToSave = this.noteDraft();
+
+    this.isSavingNote.set(true);
+
+    try {
+      const saved = this.patientsService.updatePatientNotes(targetPatientId, notesToSave);
+
+      if (saved) {
+        if (this.patient && this.patient.id === targetPatientId) {
+          this.patient.notes = notesToSave;
+        }
+        this.setNoteStatus('success', 'Patient note saved.');
+      } else {
+        this.setNoteStatus(
+          'error',
+          'Could not save the patient note. Your changes are still in the editor.',
+        );
+      }
+    } finally {
+      this.isSavingNote.set(false);
+    }
   }
 
   public exportToExcel(): void {
