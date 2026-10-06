@@ -192,6 +192,10 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
       const saved = this.patientsService.updatePatientNotes(targetPatientId, notesToSave);
 
       if (saved) {
+        // Defensive: `updatePatientNotes()` mutates the same object reference
+        // returned by `getPatientById()`, so this assignment is redundant today.
+        // Keep it so `this.patient.notes` stays in sync even if PatientsService
+        // is ever changed to return a defensive copy instead of a shared reference.
         if (this.patient && this.patient.id === targetPatientId) {
           this.patient.notes = notesToSave;
         }
