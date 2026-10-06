@@ -97,7 +97,12 @@
         </button>
       </div>
 
-      <kendo-grid [data]="appointments" adaptiveMode="auto">
+      <kendo-grid
+        [data]="appointments"
+        adaptiveMode="auto"
+        pinnable="top"
+        [pinnedTopRows]="pinnedTopAppointments"
+      >
         <kendo-grid-column field="time" title="Time" [width]="110"></kendo-grid-column>
         <kendo-grid-column
           field="patientName"

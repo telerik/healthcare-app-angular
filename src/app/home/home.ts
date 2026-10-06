@@ -140,6 +140,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Appointments data
   public appointments: GridAppointment[] = [];
 
+  // Appointments pinned to the top of the grid so they stay visible (e.g. the upcoming appointment)
+  public pinnedTopAppointments: GridAppointment[] = [];
+
   // Next Patient data
   public nextPatient: PatientProfile | null = null;
 
@@ -302,6 +305,12 @@ Dr. Carter`;
     this.pageHeaderService.title.set('Good morning, Dr. Carter');
     this.pageHeaderService.subtitle.set('Today is ' + this.currentDate);
     this.appointments = this.appointmentsService.getTodaysAppointments();
+
+    // Pin Isabella Rossi's upcoming appointment to the top of the grid so it stays visible
+    this.pinnedTopAppointments = this.appointments.filter(
+      (appointment) =>
+        appointment.patientName === 'Isabella Rossi' && appointment.status === 'Upcoming',
+    );
 
     // Set next patient to Isabella Rossi (id: 3)
     this.nextPatient = PATIENTS_DATA.find((p) => p.id === 3) || null;
