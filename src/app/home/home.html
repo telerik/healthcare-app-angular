@@ -169,8 +169,10 @@
         <!-- Reason for Visit Card -->
         <div
           class="info-card"
+          [class.info-card-disabled]="!nextPatient"
           role="button"
           tabindex="0"
+          [attr.aria-disabled]="!nextPatient"
           (click)="openReasonForVisitDialog()"
           (keyup.enter)="openReasonForVisitDialog()"
           (keyup.space)="openReasonForVisitDialog()"
@@ -181,7 +183,9 @@
           <div class="info-card-content">
             <h4 class="info-card-title">Reason for visit</h4>
             <div class="info-card-bottom">
-              <span class="info-card-text">Cardiology Follow-up</span>
+              <span class="info-card-text">{{
+                reasonForVisit?.visitType ?? 'No visit reason recorded'
+              }}</span>
               <span class="info-card-link">
                 <span class="link-text">Details</span>
                 <kendo-svgicon [icon]="chevronRightIcon"></kendo-svgicon>
@@ -193,8 +197,10 @@
         <!-- Allergy Alert Card -->
         <div
           class="info-card"
+          [class.info-card-disabled]="!nextPatient"
           role="button"
           tabindex="0"
+          [attr.aria-disabled]="!nextPatient"
           (click)="openAllergyAlertDialog()"
           (keyup.enter)="openAllergyAlertDialog()"
           (keyup.space)="openAllergyAlertDialog()"
@@ -205,7 +211,9 @@
           <div class="info-card-content">
             <h4 class="info-card-title">Allergy Alert</h4>
             <div class="info-card-bottom">
-              <span class="info-card-text">Penicillin</span>
+              <span class="info-card-text">{{
+                allergyAlert?.allergen ?? 'No known allergies'
+              }}</span>
               <span class="info-card-link">
                 <span class="link-text">Details</span>
                 <kendo-svgicon [icon]="chevronRightIcon"></kendo-svgicon>
@@ -515,56 +523,66 @@
         <div class="patient-info-grid">
           <div class="info-item">
             <span class="info-label">Patient Name:</span>
-            <span class="info-value">{{ reasonForVisit.patient }}</span>
+            <span class="info-value">{{ nextPatient?.name ?? 'Unknown patient' }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">Patient ID:</span>
-            <span class="info-value">{{ reasonForVisit.patientId }}</span>
+            <span class="info-value">{{ nextPatient?.patientCode ?? 'N/A' }}</span>
           </div>
-          <div class="info-item">
-            <span class="info-label">Appointment:</span>
-            <span class="info-value">{{ reasonForVisit.appointmentDate }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Visit Type:</span>
-            <span class="info-value">{{ reasonForVisit.visitType }}</span>
-          </div>
+          @if (reasonForVisit) {
+            <div class="info-item">
+              <span class="info-label">Appointment:</span>
+              <span class="info-value">{{ reasonForVisit.appointmentDate }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Visit Type:</span>
+              <span class="info-value">{{ reasonForVisit.visitType }}</span>
+            </div>
+          }
         </div>
       </div>
 
-      <!-- Primary Concern -->
-      <div class="alert-condition-section">
-        <h3 class="field-label">Primary Concern</h3>
-        <div class="condition-badge priority-medium">{{ reasonForVisit.primaryConcern }}</div>
-      </div>
+      @if (reasonForVisit) {
+        <!-- Primary Concern -->
+        <div class="alert-condition-section">
+          <h3 class="field-label">Primary Concern</h3>
+          <div class="condition-badge priority-medium">{{ reasonForVisit.primaryConcern }}</div>
+        </div>
 
-      <!-- Background -->
-      <div class="alert-details-section">
-        <h3 class="field-label">Background</h3>
-        <p class="details-text">{{ reasonForVisit.background }}</p>
-      </div>
+        <!-- Background -->
+        <div class="alert-details-section">
+          <h3 class="field-label">Background</h3>
+          <p class="details-text">{{ reasonForVisit.background }}</p>
+        </div>
 
-      <!-- Previous Visits -->
-      <div class="alert-recommendations-section">
-        <h3 class="field-label">Previous Visits</h3>
-        <ul class="recommendations-list">
-          @for (visit of reasonForVisit.previousVisits; track $index) {
-            <li class="recommendation-item">
-              <strong>{{ visit.date }}:</strong> {{ visit.description }}
-            </li>
-          }
-        </ul>
-      </div>
+        <!-- Previous Visits -->
+        <div class="alert-recommendations-section">
+          <h3 class="field-label">Previous Visits</h3>
+          <ul class="recommendations-list">
+            @for (visit of reasonForVisit.previousVisits; track $index) {
+              <li class="recommendation-item">
+                <strong>{{ visit.date }}:</strong> {{ visit.description }}
+              </li>
+            }
+          </ul>
+        </div>
 
-      <!-- Visit Objectives -->
-      <div class="alert-recommendations-section">
-        <h3 class="field-label">Visit Objectives</h3>
-        <ul class="recommendations-list">
-          @for (objective of reasonForVisit.objectives; track $index) {
-            <li class="recommendation-item">{{ objective }}</li>
-          }
-        </ul>
-      </div>
+        <!-- Visit Objectives -->
+        <div class="alert-recommendations-section">
+          <h3 class="field-label">Visit Objectives</h3>
+          <ul class="recommendations-list">
+            @for (objective of reasonForVisit.objectives; track $index) {
+              <li class="recommendation-item">{{ objective }}</li>
+            }
+          </ul>
+        </div>
+      } @else {
+        <div class="alert-details-section">
+          <p class="details-text empty-state">
+            No visit reason has been recorded for this patient.
+          </p>
+        </div>
+      }
     </div>
 
     <kendo-dialog-actions layout="end">
@@ -595,250 +613,81 @@
         <div class="patient-info-grid">
           <div class="info-item">
             <span class="info-label">Patient Name:</span>
-            <span class="info-value">{{ allergyAlert.patient }}</span>
+            <span class="info-value">{{ nextPatient?.name ?? 'Unknown patient' }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">Patient ID:</span>
-            <span class="info-value">{{ allergyAlert.patientId }}</span>
+            <span class="info-value">{{ nextPatient?.patientCode ?? 'N/A' }}</span>
           </div>
-          <div class="info-item">
-            <span class="info-label">Allergen:</span>
-            <span class="info-value">{{ allergyAlert.allergen }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">First Reported:</span>
-            <span class="info-value">{{ allergyAlert.firstReported }}</span>
-          </div>
+          @if (allergyAlert) {
+            <div class="info-item">
+              <span class="info-label">Allergen:</span>
+              <span class="info-value">{{ allergyAlert.allergen }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">First Reported:</span>
+              <span class="info-value">{{ allergyAlert.firstReported }}</span>
+            </div>
+          }
         </div>
       </div>
 
-      <!-- Severity & Reaction -->
-      <div class="alert-values-section">
-        <h3 class="field-label">Severity & Reaction Type</h3>
-        <div class="values-grid">
-          <div class="value-item">
-            <span class="value-label">Severity Level:</span>
-            <span class="value-number current">{{ allergyAlert.severity }}</span>
-          </div>
-          <div class="value-item">
-            <span class="value-label">Reaction Type:</span>
-            <span class="value-number current">{{ allergyAlert.reaction }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Reported Symptoms -->
-      <div class="alert-recommendations-section">
-        <h3 class="field-label">Reported Symptoms</h3>
-        <ul class="recommendations-list">
-          @for (symptom of allergyAlert.symptoms; track $index) {
-            <li class="recommendation-item">{{ symptom }}</li>
-          }
-        </ul>
-      </div>
-
-      <!-- Cross-Reactivities -->
-      <div class="alert-recommendations-section">
-        <h3 class="field-label">Cross-Reactivities (Avoid)</h3>
-        <ul class="recommendations-list">
-          @for (cross of allergyAlert.crossReactivities; track $index) {
-            <li class="recommendation-item">{{ cross }}</li>
-          }
-        </ul>
-      </div>
-
-      <!-- Safe Alternatives -->
-      <div class="alert-recommendations-section">
-        <h3 class="field-label">Safe Alternatives</h3>
-        <ul class="recommendations-list">
-          @for (alt of allergyAlert.safeAlternatives; track $index) {
-            <li class="recommendation-item">{{ alt }}</li>
-          }
-        </ul>
-      </div>
-
-      <!-- Additional Notes -->
-      <div class="alert-details-section">
-        <h3 class="field-label">Additional Notes</h3>
-        <p class="details-text">{{ allergyAlert.notes }}</p>
-      </div>
-    </div>
-
-    <kendo-dialog-actions layout="end">
-      <button kendoButton (click)="closeAllergyAlertDialog()">Close</button>
-      <button kendoButton themeColor="primary" (click)="closeAllergyAlertDialog()">
-        Acknowledge
-      </button>
-    </kendo-dialog-actions>
-  </kendo-dialog>
-}
-
-<!-- Reason for Visit Dialog -->
-@if (reasonForVisitDialogOpened) {
-  <kendo-dialog
-    [width]="dlgW(740)"
-    [height]="dlgH(680)"
-    (close)="closeReasonForVisitDialog()"
-    class="reason-visit-dialog"
-  >
-    <kendo-dialog-titlebar>
-      <div class="dialog-title">Visit Details</div>
-    </kendo-dialog-titlebar>
-
-    <div class="dialog-content">
-      <!-- Patient & Appointment Info -->
-      <div class="alert-patient-info">
-        <h3 class="field-label">Patient & Appointment</h3>
-        <div class="patient-info-grid">
-          <div class="info-item">
-            <span class="info-label">Patient Name:</span>
-            <span class="info-value">{{ reasonForVisit.patient }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Patient ID:</span>
-            <span class="info-value">{{ reasonForVisit.patientId }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Appointment:</span>
-            <span class="info-value">{{ reasonForVisit.appointmentDate }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Visit Type:</span>
-            <span class="info-value">{{ reasonForVisit.visitType }}</span>
+      @if (allergyAlert) {
+        <!-- Severity & Reaction -->
+        <div class="alert-values-section">
+          <h3 class="field-label">Severity & Reaction Type</h3>
+          <div class="values-grid">
+            <div class="value-item">
+              <span class="value-label">Severity Level:</span>
+              <span class="value-number current">{{ allergyAlert.severity }}</span>
+            </div>
+            <div class="value-item">
+              <span class="value-label">Reaction Type:</span>
+              <span class="value-number current">{{ allergyAlert.reaction }}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Primary Concern -->
-      <div class="alert-condition-section">
-        <h3 class="field-label">Primary Concern</h3>
-        <div class="condition-badge priority-medium">{{ reasonForVisit.primaryConcern }}</div>
-      </div>
-
-      <!-- Background -->
-      <div class="alert-details-section">
-        <h3 class="field-label">Background</h3>
-        <p class="details-text">{{ reasonForVisit.background }}</p>
-      </div>
-
-      <!-- Previous Visits -->
-      <div class="alert-recommendations-section">
-        <h3 class="field-label">Previous Visits</h3>
-        <ul class="recommendations-list">
-          @for (visit of reasonForVisit.previousVisits; track $index) {
-            <li class="recommendation-item">
-              <strong>{{ visit.date }}:</strong> {{ visit.description }}
-            </li>
-          }
-        </ul>
-      </div>
-
-      <!-- Visit Objectives -->
-      <div class="alert-recommendations-section">
-        <h3 class="field-label">Visit Objectives</h3>
-        <ul class="recommendations-list">
-          @for (objective of reasonForVisit.objectives; track $index) {
-            <li class="recommendation-item">{{ objective }}</li>
-          }
-        </ul>
-      </div>
-    </div>
-
-    <kendo-dialog-actions layout="end">
-      <button kendoButton (click)="closeReasonForVisitDialog()">Close</button>
-      <button kendoButton themeColor="primary" (click)="closeReasonForVisitDialog()">
-        Start Visit
-      </button>
-    </kendo-dialog-actions>
-  </kendo-dialog>
-}
-
-<!-- Allergy Alert Dialog -->
-@if (allergyAlertDialogOpened) {
-  <kendo-dialog
-    [width]="dlgW(740)"
-    [height]="dlgH(700)"
-    (close)="closeAllergyAlertDialog()"
-    class="allergy-dialog"
-  >
-    <kendo-dialog-titlebar>
-      <div class="dialog-title">⚠️ Critical Allergy Alert</div>
-    </kendo-dialog-titlebar>
-
-    <div class="dialog-content">
-      <!-- Patient & Allergen Info -->
-      <div class="alert-patient-info">
-        <h3 class="field-label">Patient & Allergen</h3>
-        <div class="patient-info-grid">
-          <div class="info-item">
-            <span class="info-label">Patient Name:</span>
-            <span class="info-value">{{ allergyAlert.patient }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Patient ID:</span>
-            <span class="info-value">{{ allergyAlert.patientId }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Allergen:</span>
-            <span class="info-value">{{ allergyAlert.allergen }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">First Reported:</span>
-            <span class="info-value">{{ allergyAlert.firstReported }}</span>
-          </div>
+        <!-- Reported Symptoms -->
+        <div class="alert-recommendations-section">
+          <h3 class="field-label">Reported Symptoms</h3>
+          <ul class="recommendations-list">
+            @for (symptom of allergyAlert.symptoms; track $index) {
+              <li class="recommendation-item">{{ symptom }}</li>
+            }
+          </ul>
         </div>
-      </div>
 
-      <!-- Severity & Reaction -->
-      <div class="alert-values-section">
-        <h3 class="field-label">Severity & Reaction Type</h3>
-        <div class="values-grid">
-          <div class="value-item">
-            <span class="value-label">Severity Level:</span>
-            <span class="value-number current">{{ allergyAlert.severity }}</span>
-          </div>
-          <div class="value-item">
-            <span class="value-label">Reaction Type:</span>
-            <span class="value-number current">{{ allergyAlert.reaction }}</span>
-          </div>
+        <!-- Cross-Reactivities -->
+        <div class="alert-recommendations-section">
+          <h3 class="field-label">Cross-Reactivities (Avoid)</h3>
+          <ul class="recommendations-list">
+            @for (cross of allergyAlert.crossReactivities; track $index) {
+              <li class="recommendation-item">{{ cross }}</li>
+            }
+          </ul>
         </div>
-      </div>
 
-      <!-- Reported Symptoms -->
-      <div class="alert-recommendations-section">
-        <h3 class="field-label">Reported Symptoms</h3>
-        <ul class="recommendations-list">
-          @for (symptom of allergyAlert.symptoms; track $index) {
-            <li class="recommendation-item">{{ symptom }}</li>
-          }
-        </ul>
-      </div>
+        <!-- Safe Alternatives -->
+        <div class="alert-recommendations-section">
+          <h3 class="field-label">Safe Alternatives</h3>
+          <ul class="recommendations-list">
+            @for (alt of allergyAlert.safeAlternatives; track $index) {
+              <li class="recommendation-item">{{ alt }}</li>
+            }
+          </ul>
+        </div>
 
-      <!-- Cross-Reactivities -->
-      <div class="alert-recommendations-section">
-        <h3 class="field-label">Cross-Reactivities (Avoid)</h3>
-        <ul class="recommendations-list">
-          @for (cross of allergyAlert.crossReactivities; track $index) {
-            <li class="recommendation-item">{{ cross }}</li>
-          }
-        </ul>
-      </div>
-
-      <!-- Safe Alternatives -->
-      <div class="alert-recommendations-section">
-        <h3 class="field-label">Safe Alternatives</h3>
-        <ul class="recommendations-list">
-          @for (alt of allergyAlert.safeAlternatives; track $index) {
-            <li class="recommendation-item">{{ alt }}</li>
-          }
-        </ul>
-      </div>
-
-      <!-- Additional Notes -->
-      <div class="alert-details-section">
-        <h3 class="field-label">Additional Notes</h3>
-        <p class="details-text">{{ allergyAlert.notes }}</p>
-      </div>
+        <!-- Additional Notes -->
+        <div class="alert-details-section">
+          <h3 class="field-label">Additional Notes</h3>
+          <p class="details-text">{{ allergyAlert.notes }}</p>
+        </div>
+      } @else {
+        <div class="alert-details-section">
+          <p class="details-text empty-state">No known allergies recorded for this patient.</p>
+        </div>
+      }
     </div>
 
     <kendo-dialog-actions layout="end">

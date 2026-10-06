@@ -24,6 +24,45 @@ export interface LabTest {
   selected: boolean;
 }
 
+export interface PreviousVisit {
+  date: string;
+  description: string;
+}
+
+/**
+ * Clinical detail shown in the "Reason for Visit" dialog.
+ * Deliberately excludes patient name/id: those must always come from the
+ * active patient (e.g. the Next Patient card) so the dialog can never drift
+ * out of sync with the patient it is describing.
+ */
+export interface ReasonForVisitDetails {
+  appointmentDate: string;
+  visitType: string;
+  primaryConcern: string;
+  background: string;
+  previousVisits: PreviousVisit[];
+  objectives: string[];
+  preparationNotes: string[];
+}
+
+/**
+ * Clinical detail shown in the "Allergy Alert" dialog.
+ * Deliberately excludes patient name/id for the same reason as
+ * {@link ReasonForVisitDetails}.
+ */
+export interface AllergyAlertDetails {
+  allergen: string;
+  allergyType: string;
+  severity: string;
+  reaction: string;
+  firstReported: string;
+  symptoms: string[];
+  crossReactivities: string[];
+  safeAlternatives: string[];
+  emergencyProtocol: string[];
+  notes: string;
+}
+
 export const DAILY_ALERTS: DailyAlert[] = [
   {
     id: 1,
@@ -190,6 +229,88 @@ export const HOME_PATIENTS: HomePatient[] = [
   { id: 4, name: 'Emily Davis', patientId: 'P-103764' },
   { id: 5, name: 'Robert Martinez', patientId: 'P-106235' },
 ];
+
+/**
+ * Reason-for-visit details keyed by `PatientProfile.id` (not name, since
+ * names are not guaranteed unique). Only patients with a populated record
+ * here have visit-reason data; any other patient id intentionally has no
+ * entry so the UI can render an explicit empty state instead of falling
+ * back to another patient's data.
+ */
+export const REASON_FOR_VISIT_BY_PATIENT_ID: Record<number, ReasonForVisitDetails> = {
+  3: {
+    appointmentDate: 'Today, 9:30 AM',
+    visitType: 'Cardiology Follow-up',
+    primaryConcern: 'Post-procedure cardiac monitoring',
+    background:
+      'Patient is scheduled for a routine cardiology follow-up appointment following a successful cardiac catheterization procedure performed 6 weeks ago. The procedure was done to evaluate coronary artery disease.',
+    previousVisits: [
+      { date: '6 weeks ago', description: 'Cardiac catheterization procedure - successful' },
+      {
+        date: '3 months ago',
+        description: 'Initial cardiology consultation - chest pain evaluation',
+      },
+      { date: '4 months ago', description: 'Stress test - abnormal results' },
+    ],
+    objectives: [
+      'Review catheterization results and discuss findings',
+      'Assess current cardiac symptoms and medication response',
+      'Evaluate ECG and recent lab work',
+      'Review lifestyle modifications and cardiac rehabilitation progress',
+      'Adjust medication dosage if necessary',
+      'Schedule next follow-up appointment',
+    ],
+    preparationNotes: [
+      'Review patient chart and catheterization report',
+      'Have recent ECG and lab results available',
+      'Prepare medication adjustment options if needed',
+    ],
+  },
+};
+
+/**
+ * Allergy-alert details keyed by `PatientProfile.id`. See
+ * {@link REASON_FOR_VISIT_BY_PATIENT_ID} for why patient ids with no entry
+ * are intentional (explicit empty state, no fallback to another patient).
+ */
+export const ALLERGY_ALERT_BY_PATIENT_ID: Record<number, AllergyAlertDetails> = {
+  3: {
+    allergen: 'Penicillin',
+    allergyType: 'Drug Allergy',
+    severity: 'Severe',
+    reaction: 'Anaphylaxis',
+    firstReported: 'March 2018',
+    symptoms: [
+      'Difficulty breathing and wheezing',
+      'Severe skin rash and hives',
+      'Swelling of face, lips, and throat',
+      'Rapid pulse and dizziness',
+      'Loss of consciousness (reported in initial episode)',
+    ],
+    crossReactivities: [
+      'Amoxicillin',
+      'Ampicillin',
+      'Other beta-lactam antibiotics',
+      'Possibly cephalosporins (use with caution)',
+    ],
+    safeAlternatives: [
+      'Fluoroquinolones (e.g., Levofloxacin, Ciprofloxacin)',
+      'Macrolides (e.g., Azithromycin, Clarithromycin)',
+      'Tetracyclines (e.g., Doxycycline)',
+      'Vancomycin for severe infections',
+    ],
+    emergencyProtocol: [
+      'Immediately discontinue any suspected beta-lactam antibiotic',
+      'Administer epinephrine 0.3-0.5mg IM if anaphylaxis symptoms appear',
+      'Administer antihistamines (Diphenhydramine 50mg)',
+      'Provide oxygen support and monitor vital signs',
+      'Call emergency response team',
+      'Be prepared for potential intubation if airway compromised',
+    ],
+    notes:
+      'Patient carries EpiPen at all times. Family members are trained in emergency response. Allergy documented in all medical records and patient wears medical alert bracelet.',
+  },
+};
 
 export const LAB_TESTS: LabTest[] = [
   { id: 1, name: 'Complete blood count (CBC)', selected: false },
