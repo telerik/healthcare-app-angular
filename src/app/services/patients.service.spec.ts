@@ -40,4 +40,18 @@ describe('PatientsService', () => {
     expect(updated).toBe(true);
     expect(profile?.notes).toBe('Dummy test notes');
   });
+
+  it('should persist an empty note', () => {
+    const existingPatient = service.getAllPatients()[0];
+    const updated = service.updatePatientNotes(existingPatient.id, '');
+
+    expect(updated).toBe(true);
+    expect(service.getPatientById(existingPatient.id)?.notes).toBe('');
+  });
+
+  it('should report failure when updating notes for an unknown patient', () => {
+    const updated = service.updatePatientNotes(-1, 'Orphan note');
+
+    expect(updated).toBe(false);
+  });
 });
