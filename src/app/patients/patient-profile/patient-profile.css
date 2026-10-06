@@ -233,6 +233,23 @@
   width: 100%;
 }
 
+.note-status {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.note-status-success {
+  background: #e6f7ed;
+  color: #1a7f45;
+}
+
+.note-status-error {
+  background: #fdecea;
+  color: #c62828;
+}
+
 /* Lab Results Card */
 .lab-results-grid {
   width: 100%;

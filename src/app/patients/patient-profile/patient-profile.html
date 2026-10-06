@@ -124,9 +124,17 @@
           Save
         </button>
       </div>
+      @if (saveNotesStatus === 'success') {
+        <div class="note-status note-status-success" role="status">Note saved successfully.</div>
+      }
+      @if (saveNotesStatus === 'error') {
+        <div class="note-status note-status-error" role="alert">
+          Failed to save note. Please try again.
+        </div>
+      }
       <kendo-editor
         class="patient-note-editor"
-        [value]="patient?.notes || ''"
+        [(value)]="patientNoteContent"
         [style.height.px]="250"
         [iframeCss]="editorIframeCss"
       >

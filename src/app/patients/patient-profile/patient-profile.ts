@@ -71,6 +71,9 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
   public patient: PatientProfile | null = null;
   public labResults: LabResult[] = [];
   public labResultsSort: SortDescriptor[] = [{ field: 'testName', dir: 'asc' }];
+  public patientNoteContent = '';
+  public saveNotesStatus: 'success' | 'error' | null = null;
+  private saveNotesStatusTimeoutId: ReturnType<typeof setTimeout> | undefined;
 
   private pageHeaderService = inject(PageHeaderService);
   private route = inject(ActivatedRoute);
@@ -94,6 +97,10 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.pageHeaderService.title.set('');
     this.pageHeaderService.subtitle.set('');
+
+    if (this.saveNotesStatusTimeoutId !== undefined) {
+      clearTimeout(this.saveNotesStatusTimeoutId);
+    }
   }
 
   private loadPatientData(): void {
@@ -101,6 +108,8 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
     if (patientData) {
       this.patient = patientData;
       this.labResults = patientData.labResults;
+      this.patientNoteContent = patientData.notes ?? '';
+      this.saveNotesStatus = null;
     } else {
       // Patient not found, navigate back to patients list
       this.router.navigate(['/patients']);
@@ -118,8 +127,16 @@ export class PatientProfileComponent implements OnInit, OnDestroy {
   }
 
   public saveNotes(): void {
-    console.log('Saving patient notes...');
-    // In a real app, save to backend service
+    const success = this.patientsService.updatePatientNotes(this.patientId, this.patientNoteContent);
+    this.saveNotesStatus = success ? 'success' : 'error';
+
+    if (this.saveNotesStatusTimeoutId !== undefined) {
+      clearTimeout(this.saveNotesStatusTimeoutId);
+    }
+    this.saveNotesStatusTimeoutId = setTimeout(() => {
+      this.saveNotesStatus = null;
+      this.saveNotesStatusTimeoutId = undefined;
+    }, 4000);
   }
 
   public exportToExcel(): void {
