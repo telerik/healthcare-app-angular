@@ -40,4 +40,28 @@ describe('PatientsService', () => {
     expect(updated).toBe(true);
     expect(profile?.notes).toBe('Dummy test notes');
   });
+
+  it('should return the matching patient for a known patientCode', () => {
+    const patient = service.getPatientByCode('P-104505');
+
+    expect(patient).not.toBeNull();
+    expect(patient?.id).toBe(5);
+  });
+
+  it('should match patientCode case-insensitively', () => {
+    const patient = service.getPatientByCode('p-104505');
+
+    expect(patient).not.toBeNull();
+    expect(patient?.id).toBe(5);
+  });
+
+  it('should return null for an unknown patientCode', () => {
+    expect(service.getPatientByCode('P-999999')).toBeNull();
+  });
+
+  it('should return null for an empty or null-ish patientCode without throwing', () => {
+    expect(service.getPatientByCode('')).toBeNull();
+    expect(() => service.getPatientByCode(null as unknown as string)).not.toThrow();
+    expect(service.getPatientByCode(null as unknown as string)).toBeNull();
+  });
 });
