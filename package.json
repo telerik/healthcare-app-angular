@@ -8,6 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test --watch=false",
     "lint": "ng lint",
+    "cleanup": "bash reset-workspace.sh",
     "prepare": "husky",
     "setup-hooks": "husky"
   },

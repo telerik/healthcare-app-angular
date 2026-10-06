@@ -49,17 +49,20 @@ telerik-license.txt
 # Dev container local secrets (copied from the host, never commit)
 .devcontainer/.npmrc
 
-# Nia CLI — local state, caches, logs and machine-specific config (do NOT commit).
+# Forge CLI — local state, caches, logs and machine-specific config (do NOT commit).
 # Committed Nia config (.nia/config/project.toml, toolchain.toml) is kept tracked.
 # agents.toml is machine/user-specific — commit agents.toml.example instead.
-.nia/config/agents.toml
-.nia/context.toml
-.nia/.context.lock
-.nia/cache/
-.nia/logs/
-.nia/work/*/
-.nia/config/workflows/
-.nia/config/telemetry.toml
+# forge CLI exclusions
+.forge/context.toml
+.forge/cache/
+.forge/logs/utility.jsonl
+.forge/work/logs/
+.forge/.context.lock
+.forge/config/telemetry.toml
+.forge/.config_lock
+.forge/config/*.bak
+.forge/work/*/approvals/*.toml
+sessions.toml
 .heartbeat
 sessions.toml
 .workflow.lock

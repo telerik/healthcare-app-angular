@@ -69,6 +69,36 @@ npm run build      # or: ng build
 
 Build artifacts are stored in the `dist/` directory.
 
+### Visual Quick-Fix Workflow (Forge)
+
+The [quick-fix-to-pr-visual workflow](.forge/config/workflows/quick-fix-to-pr-visual.toml)
+is for trivial Angular UI fixes. It captures before/after Playwright evidence,
+requires an explicit functional-verification pass, and publishes a PR for manual
+review and merge. It skips a separate planning and code-review phase, but retains
+the final lightweight PR review. Retries require approval and have hard limits.
+
+Use a current `frg` build supporting workflow output captures, `config` operations,
+and approval inputs. Install the app dependencies, authenticate the configured AI
+agent and `gh`, and make `playwright-cli` and its browser available. The workflow
+uses the local [Playwright skill](.agents/skills/playwright-cli/SKILL.md) and starts
+the Angular development server with `npm start` when needed.
+
+```bash
+frg config set-issue <issue-number>
+frg workflow validate quick-fix-to-pr-visual
+frg workflow run quick-fix-to-pr-visual
+```
+
+To skip the optional before snapshot, add `--start-from create_code`. This starts
+a new run, not a resumed process. To stop before pushing or creating a PR, add
+`--ends-at create_pr`.
+
+Evidence is retained in the run's `{{job_dir}}/visual-evidence` directory. The PR
+receives a written verification summary; screenshots are attached only when a
+supported upload mechanism is available, otherwise their local paths are reported.
+Use only demo patient data. After reviewing the evidence, remove it when no longer
+needed and stop only development-server sessions started for this run.
+
 ---
 
 ## Experiment with the Nia CLI
