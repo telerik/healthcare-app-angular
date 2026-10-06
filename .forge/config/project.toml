@@ -1,0 +1,27 @@
+schema_version = "1.0.0"
+
+[project]
+name = "healthcare-app-angular"
+description = "Healthcare dashboard application with patient management, scheduling, and analytics"
+language = "TypeScript"
+framework = "Angular"
+testing_framework = "Vitest"
+package_manager = "npm"
+
+[commit]
+behavior = "enabled"
+
+[branch]
+behavior = "auto"
+base = "main"
+naming = "forge/issue-{issue}-{slug}"
+checkout = true
+on_dirty = "carry"
+on_collision = "checkout"
+
+[beta_consent]
+acknowledged = true
+acknowledgement_date = "2026-10-02T09:13:50.669217+00:00"
+acknowledged_by = "forge-desktop"
+version_at_consent = "4.7.0-dev.6"
+consent_phrase = "I understand"
