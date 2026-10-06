@@ -478,6 +478,20 @@
         <p class="details-text">{{ selectedAlert.details }}</p>
       </div>
 
+      <!-- Suggested Next Action -->
+      <div>
+        <h3 class="field-label" id="suggested-action-label">Suggested Next Action</h3>
+        <div
+          class="suggested-action"
+          [class.priority-high]="selectedAlert.priority === 'High'"
+          [class.priority-medium]="selectedAlert.priority === 'Medium'"
+          [class.priority-low]="selectedAlert.priority === 'Low'"
+          aria-labelledby="suggested-action-label"
+        >
+          {{ suggestedActionFor(selectedAlert) }}
+        </div>
+      </div>
+
       <!-- Recommendations -->
       <div>
         <h3 class="field-label">Recommended Actions</h3>
@@ -489,7 +503,37 @@
       </div>
     </div>
 
+    @if (alertPatientLookupError()) {
+      <div class="alert-lookup-error" role="alert">{{ alertPatientLookupError() }}</div>
+    }
+
     <kendo-dialog-actions layout="end">
+      <div class="alert-cta-row">
+        <button
+          kendoButton
+          fillMode="outline"
+          (click)="reviewAlertPatient()"
+          [attr.aria-label]="'Review patient profile for ' + selectedAlert.patient"
+        >
+          Review
+        </button>
+        <button
+          kendoButton
+          fillMode="outline"
+          (click)="addNoteForAlert()"
+          [attr.aria-label]="'Add a clinical note for ' + selectedAlert.patient"
+        >
+          Add Note
+        </button>
+        <button
+          kendoButton
+          fillMode="outline"
+          (click)="requestTestForAlert()"
+          [attr.aria-label]="'Request a lab test for ' + selectedAlert.patient"
+        >
+          Request Test
+        </button>
+      </div>
       <button kendoButton (click)="closeAlertDialog()">Close</button>
       <button kendoButton themeColor="primary" (click)="acknowledgeAlert()">Acknowledge</button>
     </kendo-dialog-actions>

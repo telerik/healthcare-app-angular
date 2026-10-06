@@ -32,6 +32,17 @@ export class PatientsService {
   }
 
   /**
+   * Get full patient profile by patient code (case-insensitive), e.g. 'P-104505'
+   */
+  public getPatientByCode(code: string): PatientProfile | null {
+    if (!code) {
+      return null;
+    }
+    const normalized = code.trim().toUpperCase();
+    return this.patientsData.find((p) => p.patientCode.toUpperCase() === normalized) || null;
+  }
+
+  /**
    * Update patient notes
    */
   public updatePatientNotes(id: number, notes: string): boolean {

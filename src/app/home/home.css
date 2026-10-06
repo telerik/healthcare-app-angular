@@ -81,7 +81,8 @@
   max-width: 42px;
   padding: 0 12px !important;
   justify-content: flex-start !important;
-  transition: max-width var(--kendo-duration-speedy, 300ms) var(--kendo-easing-standard, cubic-bezier(0.42, 0, 0.58, 1));
+  transition: max-width var(--kendo-duration-speedy, 300ms)
+    var(--kendo-easing-standard, cubic-bezier(0.42, 0, 0.58, 1));
 }
 
 .card-action-btn:hover {
@@ -100,7 +101,8 @@
   opacity: 0;
   overflow: hidden;
   display: inline-block;
-  transition: opacity var(--kendo-duration-swift, 250ms) var(--kendo-easing-decelerate, cubic-bezier(0, 0, 0.58, 1));
+  transition: opacity var(--kendo-duration-swift, 250ms)
+    var(--kendo-easing-decelerate, cubic-bezier(0, 0, 0.58, 1));
 }
 
 .card-action-btn:hover .card-action-text {
@@ -116,7 +118,9 @@
   opacity: 0.4;
   color: #6366fb;
   pointer-events: none;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
 }
 
 .action-card:hover .card-bg-icon {
@@ -161,6 +165,57 @@
   background: #fef3c7;
   color: #d97706;
   border: 1px solid #fcd34d;
+}
+
+.suggested-action {
+  padding: 12px 16px;
+  border-radius: 8px;
+  border-left: 4px solid #9ca3af;
+  background: #f3f4f6;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.suggested-action.priority-high {
+  background: #fee2e2;
+  color: #dc2626;
+  border-left-color: #dc2626;
+  font-weight: 600;
+}
+
+.suggested-action.priority-medium {
+  background: #fef3c7;
+  color: #d97706;
+  border-left-color: #d97706;
+}
+
+.suggested-action.priority-low {
+  background: #f3f4f6;
+  color: #374151;
+  border-left-color: #9ca3af;
+}
+
+.alert-lookup-error {
+  margin: 0 16px 8px;
+  color: #dc2626;
+  font-size: 14px;
+}
+
+.alert-cta-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-inline-end: auto;
+}
+
+@media (max-width: 1000px) {
+  .alert-cta-row {
+    width: 100%;
+  }
+
+  .alert-cta-row button {
+    flex: 1 1 auto;
+  }
 }
 
 /* Next Patient Section */
@@ -330,8 +385,12 @@
   flex-shrink: 0;
 }
 
-.info-card-icon.blue-bg { background: #d2e2fb; }
-.info-card-icon.yellow-bg { background: #fff4d3; }
+.info-card-icon.blue-bg {
+  background: #d2e2fb;
+}
+.info-card-icon.yellow-bg {
+  background: #fff4d3;
+}
 
 .info-card-content {
   display: flex;
@@ -435,7 +494,6 @@
   margin: 0;
 }
 
-
 .dialog-content {
   padding: 16px;
   display: flex;
@@ -533,7 +591,6 @@
 
 /* Alert Dialog Content */
 
-
 .patient-info-grid,
 .values-grid {
   display: grid;
@@ -579,8 +636,12 @@
   font-weight: 700;
 }
 
-.value-number.current { color: #dc2626; }
-.value-number.normal { color: #64748b; }
+.value-number.current {
+  color: #dc2626;
+}
+.value-number.normal {
+  color: #64748b;
+}
 
 .details-text {
   font-size: 16px;
@@ -666,7 +727,7 @@
   height: 32px;
 }
 
-.k-chat{
+.k-chat {
   border: none;
 }
 

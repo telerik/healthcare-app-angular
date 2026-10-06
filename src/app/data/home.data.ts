@@ -1,3 +1,7 @@
+import { PATIENTS_DATA } from './patients.data';
+
+export type AlertPriority = 'High' | 'Medium' | 'Low';
+
 export interface DailyAlert {
   id: number;
   title: string;
@@ -7,7 +11,8 @@ export interface DailyAlert {
   condition: string;
   value: string;
   normalRange: string;
-  priority: string;
+  priority: AlertPriority;
+  suggestedAction: string;
   details: string;
   recommendations: string[];
 }
@@ -27,14 +32,16 @@ export interface LabTest {
 export const DAILY_ALERTS: DailyAlert[] = [
   {
     id: 1,
-    title: 'CRP elevated - Sophia Martinez',
-    patient: 'Sophia Martinez',
-    patientId: 'P-105328',
+    title: 'CRP elevated - Sophia Bennett',
+    patient: 'Sophia Bennett',
+    patientId: 'P-104505',
     time: 'Now',
     condition: 'CRP Elevated',
     value: '12.5 mg/L',
     normalRange: '0-10 mg/L',
     priority: 'High',
+    suggestedAction:
+      'Order an inflammatory markers panel and review for infection within 24 hours.',
     details:
       'C-reactive protein (CRP) levels are significantly elevated, indicating possible inflammation or infection. Recent lab results show a marked increase from the last test.',
     recommendations: [
@@ -46,14 +53,16 @@ export const DAILY_ALERTS: DailyAlert[] = [
   },
   {
     id: 2,
-    title: 'Blood pressure high - James Carter',
-    patient: 'James Carter',
-    patientId: 'P-104582',
+    title: 'Blood pressure high - Michael Carter',
+    patient: 'Michael Carter',
+    patientId: 'P-104504',
     time: '2 min ago',
     condition: 'Blood Pressure High',
     value: '165/98 mmHg',
     normalRange: '120/80 mmHg',
     priority: 'High',
+    suggestedAction:
+      'Review antihypertensive dosage and recheck blood pressure before the patient leaves.',
     details:
       'Blood pressure readings are consistently elevated above normal range. Patient has history of hypertension but readings have increased despite current medication.',
     recommendations: [
@@ -66,14 +75,15 @@ export const DAILY_ALERTS: DailyAlert[] = [
   },
   {
     id: 3,
-    title: 'Glucose levels elevated - Daniel Rivera',
-    patient: 'Daniel Rivera',
-    patientId: 'P-103847',
+    title: 'Glucose levels elevated - Daniel Thompson',
+    patient: 'Daniel Thompson',
+    patientId: 'P-104502',
     time: '8 min ago',
     condition: 'Glucose Levels Elevated',
     value: '185 mg/dL',
     normalRange: '70-100 mg/dL',
     priority: 'Medium',
+    suggestedAction: 'Order an HbA1c test and schedule a diabetes-prevention follow-up in 2 weeks.',
     details:
       'Fasting glucose levels are elevated above normal range. Patient has pre-diabetes diagnosis and recent readings show progression.',
     recommendations: [
@@ -86,14 +96,15 @@ export const DAILY_ALERTS: DailyAlert[] = [
   },
   {
     id: 4,
-    title: 'High cholesterol detected - Ava Thompson',
-    patient: 'Ava Thompson',
-    patientId: 'P-106749',
+    title: 'High cholesterol detected - Ava Johnson',
+    patient: 'Ava Johnson',
+    patientId: 'P-104507',
     time: '15 min ago',
     condition: 'High Cholesterol',
     value: 'Total: 265 mg/dL, LDL: 175 mg/dL',
     normalRange: 'Total: <200 mg/dL, LDL: <100 mg/dL',
     priority: 'Medium',
+    suggestedAction: 'Initiate statin therapy and schedule a cardiovascular risk assessment.',
     details:
       'Lipid panel shows significantly elevated total cholesterol and LDL levels, increasing cardiovascular risk. Patient has family history of heart disease.',
     recommendations: [
@@ -106,14 +117,15 @@ export const DAILY_ALERTS: DailyAlert[] = [
   },
   {
     id: 5,
-    title: 'Low hemoglobin - Marcus Johnson',
-    patient: 'Marcus Johnson',
-    patientId: 'P-107312',
+    title: 'Low hemoglobin - James Walker',
+    patient: 'James Walker',
+    patientId: 'P-104506',
     time: '22 min ago',
     condition: 'Low Hemoglobin',
     value: '9.2 g/dL',
     normalRange: '13.5-17.5 g/dL',
     priority: 'High',
+    suggestedAction: 'Order iron studies and a full blood count, and assess for active bleeding.',
     details:
       'Hemoglobin levels are critically below the normal range suggesting moderate anemia. Patient reports fatigue and shortness of breath on exertion.',
     recommendations: [
@@ -125,14 +137,15 @@ export const DAILY_ALERTS: DailyAlert[] = [
   },
   {
     id: 6,
-    title: 'Elevated creatinine - Olivia Chen',
-    patient: 'Olivia Chen',
-    patientId: 'P-108456',
+    title: 'Elevated creatinine - Olivia Martinez',
+    patient: 'Olivia Martinez',
+    patientId: 'P-104501',
     time: '35 min ago',
     condition: 'Elevated Creatinine',
     value: '2.1 mg/dL',
     normalRange: '0.5-1.1 mg/dL',
     priority: 'High',
+    suggestedAction: 'Discontinue NSAIDs now and order a renal ultrasound with GFR estimation.',
     details:
       'Serum creatinine is markedly elevated indicating reduced kidney function. Patient is on NSAIDs which may be contributing to renal impairment.',
     recommendations: [
@@ -144,14 +157,16 @@ export const DAILY_ALERTS: DailyAlert[] = [
   },
   {
     id: 7,
-    title: 'Abnormal ECG - Robert Patel',
-    patient: 'Robert Patel',
-    patientId: 'P-109023',
+    title: 'Abnormal ECG - James Wilson',
+    patient: 'James Wilson',
+    patientId: 'P-104508',
     time: '52 min ago',
     condition: 'Abnormal ECG',
     value: 'ST-segment depression',
     normalRange: 'Normal sinus rhythm',
     priority: 'High',
+    suggestedAction:
+      'Repeat the ECG immediately, order troponin, and request an urgent cardiology consult.',
     details:
       'ECG shows ST-segment depression in leads V4-V6, potentially indicating myocardial ischemia. Patient reports intermittent chest tightness.',
     recommendations: [
@@ -164,14 +179,16 @@ export const DAILY_ALERTS: DailyAlert[] = [
   },
   {
     id: 8,
-    title: 'Potassium level low - Elena Vasquez',
-    patient: 'Elena Vasquez',
-    patientId: 'P-110198',
+    title: 'Potassium level low - Isabella Clark',
+    patient: 'Isabella Clark',
+    patientId: 'P-104509',
     time: '1 hr ago',
     condition: 'Hypokalemia',
     value: '2.9 mEq/L',
     normalRange: '3.5-5.0 mEq/L',
     priority: 'Medium',
+    suggestedAction:
+      'Start oral potassium supplementation and repeat the electrolyte panel in 24 hours.',
     details:
       'Potassium levels are below normal range. Patient is on loop diuretics for heart failure management which can cause potassium depletion.',
     recommendations: [
@@ -183,13 +200,11 @@ export const DAILY_ALERTS: DailyAlert[] = [
   },
 ];
 
-export const HOME_PATIENTS: HomePatient[] = [
-  { id: 1, name: 'James Wilson', patientId: 'P-104582' },
-  { id: 2, name: 'Sarah Johnson', patientId: 'P-102439' },
-  { id: 3, name: 'Michael Chen', patientId: 'P-105821' },
-  { id: 4, name: 'Emily Davis', patientId: 'P-103764' },
-  { id: 5, name: 'Robert Martinez', patientId: 'P-106235' },
-];
+export const HOME_PATIENTS: HomePatient[] = PATIENTS_DATA.map((patient) => ({
+  id: patient.id,
+  name: patient.name,
+  patientId: patient.patientCode,
+}));
 
 export const LAB_TESTS: LabTest[] = [
   { id: 1, name: 'Complete blood count (CBC)', selected: false },

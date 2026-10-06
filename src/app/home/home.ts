@@ -52,9 +52,11 @@ import {
   HomePatient,
   LabTest,
 } from '../data/home.data';
+import { resolveSuggestedAction } from '../data/alert-suggestions';
 import { MarkdownPipe } from '../pipes/markdown.pipe';
 import { AppointmentsService, GridAppointment } from '../services/appointments.service';
 import { PageHeaderService } from '../services/page-header.service';
+import { PatientsService } from '../services/patients.service';
 
 @Component({
   selector: 'app-home',
@@ -191,6 +193,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   public selectedAlert: DailyAlert | null = null;
 
+  /** Inline fallback message shown when an alert's patient cannot be resolved. */
+  public alertPatientLookupError = signal<string | null>(null);
+
   // Reason for Visit data
   public reasonForVisit = {
     patient: 'Isabella Rossi',
@@ -286,6 +291,7 @@ Dr. Carter`;
   private pageHeaderService = inject(PageHeaderService);
   private router = inject(Router);
   private appointmentsService = inject(AppointmentsService);
+  private patientsService = inject(PatientsService);
 
   constructor() {
     const date = new Date();
@@ -391,11 +397,13 @@ Dr. Carter`;
 
   // Alert dialog methods
   public openAlertDialog(alert: DailyAlert): void {
+    this.alertPatientLookupError.set(null);
     this.selectedAlert = alert;
     this.alertDialogOpened = true;
   }
 
   public closeAlertDialog(): void {
+    this.alertPatientLookupError.set(null);
     this.alertDialogOpened = false;
   }
 
@@ -403,6 +411,73 @@ Dr. Carter`;
     console.log('Alert acknowledged:', this.selectedAlert);
     // Here you would typically update the alert status via a service
     this.closeAlertDialog();
+  }
+
+  /** Returns the "Suggested Next Action" text to display for the given alert. */
+  public suggestedActionFor(alert: DailyAlert | null): string {
+    return resolveSuggestedAction(alert);
+  }
+
+  /**
+   * Resolves the currently selected alert's `patientId` to a full `PatientProfile`
+   * (for navigation) and a matching `HomePatient` (for pre-populating the Note / Lab
+   * Test dialogs). Sets `alertPatientLookupError` and returns `null` when the alert or
+   * its patient cannot be resolved.
+   */
+  private resolveAlertPatient(): { profile: PatientProfile; homePatient: HomePatient } | null {
+    const alert = this.selectedAlert;
+    if (!alert) {
+      this.alertPatientLookupError.set('No alert is currently selected.');
+      return null;
+    }
+    const profile = this.patientsService.getPatientByCode(alert.patientId);
+    if (!profile) {
+      this.alertPatientLookupError.set(
+        `Patient record for ${alert.patient} (${alert.patientId}) could not be located.`,
+      );
+      return null;
+    }
+    const homePatient = this.patients.find((p) => p.patientId === profile.patientCode) ?? {
+      id: profile.id,
+      name: profile.name,
+      patientId: profile.patientCode,
+    };
+    this.alertPatientLookupError.set(null);
+    return { profile, homePatient };
+  }
+
+  /** Review CTA (US-001): navigates to the alert patient's profile. */
+  public reviewAlertPatient(): void {
+    const resolved = this.resolveAlertPatient();
+    if (!resolved) {
+      return;
+    }
+    this.closeAlertDialog();
+    this.router.navigate(['/patients', resolved.profile.id]);
+  }
+
+  /** Add Note CTA (US-002): opens the Clinical Note dialog pre-populated for the patient. */
+  public addNoteForAlert(): void {
+    const resolved = this.resolveAlertPatient();
+    if (!resolved) {
+      return;
+    }
+    this.selectedPatient = resolved.homePatient;
+    this.clinicalNoteText = '';
+    this.closeAlertDialog();
+    this.openClinicalNoteDialog();
+  }
+
+  /** Request Test CTA (US-003): opens the Lab Test dialog pre-populated for the patient. */
+  public requestTestForAlert(): void {
+    const resolved = this.resolveAlertPatient();
+    if (!resolved) {
+      return;
+    }
+    this.labTestPatient = resolved.homePatient;
+    this.labTestSearchQuery = '';
+    this.closeAlertDialog();
+    this.openLabTestDialog();
   }
 
   // Reason for Visit dialog methods
