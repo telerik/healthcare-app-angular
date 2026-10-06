@@ -1,0 +1,298 @@
+workflow_schema_version = "1.0.0"
+
+[workflow]
+name = "quick-fix-to-pr-visual"
+description = "A trivial Angular UI fix without a separate planning or code-review phase: capture before/after Playwright evidence, verify behavior, then publish and review a PR."
+version = "0.2.0"
+required_context = ["issue_id"]
+
+[workflow.loop_detection]
+max_transitions = 100
+on_loop_detected = "approval_gate"
+
+[workflow.initial_state]
+name = "capture_before_snapshot"
+
+[[workflow.states]]
+name = "capture_before_snapshot"
+description = "Capture a best-effort visual baseline"
+is_exit_point = true
+operation = { id = "capture-before", type = "agent", prompt = """
+    Capture a before-change baseline for issue {{issue_id}} without modifying app code.
+    Follow .agents/skills/playwright-cli/SKILL.md. This is an Angular application,
+    not an Aspire application. Work from {{project_root}}.
+
+    1. Reuse a development server only if it serves this checkout. Otherwise start
+       `npm start -- --host 127.0.0.1 --port 4200` in a managed background session.
+       If that port is occupied by another app, choose a free port. Use the actual
+       URL printed by Angular. Do not stop unrelated servers or install dependencies
+       silently; report missing prerequisites.
+    2. Create {{job_dir}}/visual-evidence. Record the app URL, affected route,
+       viewport, reproduction steps, and any server session you started in baseline.md
+       in that directory. Use only demo data, never real patient information.
+    3. Open the app with `playwright-cli open <URL>`, navigate to the affected
+       feature, and use a consistent viewport for before/after comparisons.
+       Save `playwright-cli --raw snapshot` output to
+       {{job_dir}}/visual-evidence/before.yml and run
+       `playwright-cli screenshot --filename="{{job_dir}}/visual-evidence/before.png"`.
+    4. Close your browser session with `playwright-cli close`.
+
+    Capture is best-effort. If unavailable, record the reason in baseline.md and
+    stop this step without trying to repair the environment. The fix may proceed.
+    """, context = ["issue"] }
+on_success = "create_code"
+on_failure = "create_code"
+
+[[workflow.states]]
+name = "create_code"
+description = "Generate the small fix directly from the issue"
+is_entry_point = true
+operation = { target = "code", operation = "create" }
+max_visits = 6
+loop_enabled = true
+loop_counter = "code_iterations"
+on_success = "capture_after_snapshot"
+on_failure = "create_code"
+
+[[workflow.states.escape_conditions]]
+counter_value = 2
+action = "approval"
+approval_gate = "iteration_gate"
+approval_message = "Code generation has required 2 iterations. Confirm this is still a trivial fix before continuing."
+
+[[workflow.states.escape_conditions]]
+counter_value = 6
+action = "abort"
+error_message = "Quick-fix code iteration limit reached. Use a planned workflow."
+
+[[workflow.states]]
+name = "iteration_gate"
+description = "Confirm the fix still belongs on the quick path"
+on_success = "create_code"
+on_failure = "code_iteration_rejected"
+
+[workflow.states.approval]
+gate_id = "quick_fix_escape"
+message = "Continue the quick fix, or reject and use a planned workflow?"
+timeout_seconds = 86400
+
+[[workflow.states]]
+name = "capture_after_snapshot"
+description = "Capture a best-effort after-change snapshot"
+max_visits = 3
+loop_enabled = true
+loop_counter = "visual_verification_iterations"
+operation = { id = "capture-after", type = "agent", prompt = """
+    Capture the updated Angular UI using .agents/skills/playwright-cli/SKILL.md.
+    Work from {{project_root}} and create {{job_dir}}/visual-evidence if missing.
+    Read baseline.md and before.yml there if available. Reuse the recorded route
+    and viewport. Confirm the server serves the latest code from this checkout;
+    otherwise start `npm start -- --host 127.0.0.1 --port 4200` in a managed
+    background session, choosing a free port if necessary. Record its actual URL.
+    If the baseline was skipped, derive the route and reproduction steps from the issue.
+
+    Open the app with `playwright-cli open <URL>`, navigate to the affected feature,
+    save `playwright-cli --raw snapshot` output to
+    {{job_dir}}/visual-evidence/after.yml, and run
+    `playwright-cli screenshot --filename="{{job_dir}}/visual-evidence/after.png"`.
+    Close your browser session. Record any capture failure; screenshots are
+    best-effort, but the following functional verification is mandatory.
+    """, context = ["issue"] }
+on_success = "playwright_verify"
+on_failure = "playwright_verify"
+
+[[workflow.states.escape_conditions]]
+counter_value = 2
+action = "approval"
+approval_gate = "visual_iteration_gate"
+approval_message = "Visual verification has required 2 iterations. Confirm this remains a trivial fix."
+
+[[workflow.states.escape_conditions]]
+counter_value = 3
+action = "abort"
+error_message = "Quick-fix visual verification limit reached. Investigate before retrying."
+
+[[workflow.states]]
+name = "visual_iteration_gate"
+description = "Review repeated visual verification attempts"
+on_success = "capture_after_snapshot"
+on_failure = "visual_verification_failed"
+
+[workflow.states.approval]
+gate_id = "quick_fix_visual_escape"
+message = "Continue visual verification, or reject and use a broader workflow?"
+timeout_seconds = 86400
+
+[[workflow.states]]
+name = "playwright_verify"
+description = "Exercise the changed behavior with Playwright"
+operation = { id = "playwright-verify", type = "agent", prompt = """
+    Verify issue {{issue_id}} using .agents/skills/playwright-cli/SKILL.md.
+    A screenshot alone is not a pass. Open a fresh browser session against the
+    actual local Angular URL recorded in {{job_dir}}/visual-evidence/baseline.md
+    or the preceding capture step. Exercise the affected user flow and assert
+    the expected behavior. Check relevant neighboring interactions and inspect
+    `playwright-cli console` for regressions. Do not modify code in this step.
+
+    Overwrite {{job_dir}}/visual-evidence/verification-summary.md with the URL,
+    route, actions, assertions, actual results, console errors, and PASS or FAIL.
+    Missing prerequisites or inability to exercise the flow are FAIL, not a pass.
+    Close your browser session. End your reply with exactly one result line:
+    VISUAL_RESULT: VERIFIED
+    or
+    VISUAL_RESULT: FAILED
+    Report VERIFIED only when the behavior was exercised and all checks passed.
+    """, context = ["issue"], share_session_with = "capture_after_snapshot", outputs = { visual_result = '(?m)^VISUAL_RESULT: (VERIFIED|FAILED)\s*$' } }
+on_success = "check_verification_result"
+on_failure = "fix_verification_issues"
+
+[[workflow.states]]
+name = "check_verification_result"
+description = "Require an explicit successful verification result"
+operation = { id = "check-visual-result", type = "shell", command = 'test "{{visual_result}}" = "VERIFIED"' }
+on_success = "create_pr"
+on_failure = "fix_verification_issues"
+
+[[workflow.states]]
+name = "fix_verification_issues"
+description = "Fix the failures reported by Playwright"
+operation = { id = "fix-verification-issues", type = "agent", prompt = """
+    Read {{job_dir}}/visual-evidence/verification-summary.md and fix the reported
+    regressions for issue {{issue_id}}. Keep the change small and follow repository
+    conventions. If the summary is missing or the failure is an unavailable
+    prerequisite, report the blocker instead of inventing a successful result.
+    Do not mark verification as passed; the next steps must capture and test again.
+    """, context = ["issue"], share_session_with = "playwright_verify" }
+on_success = "capture_after_snapshot"
+on_failure = "visual_verification_failed"
+
+[[workflow.states]]
+name = "create_pr"
+description = "Push safely and create or find the pull request"
+is_exit_point = true
+operation = { id = "create-pr", type = "agent", prompt = """
+    Create a PR for issue {{issue_id}} from the current feature branch to
+    {{branch_base}}. Work from {{project_root}}.
+
+    1. Inspect `git branch --show-current` and `git status -sb`. Do not open a PR
+       from the base branch. Ensure the intended fix is committed according to
+       repository conventions without including unrelated changes or local evidence.
+    2. Push using `git push -u origin <branch>`. If the branch is diverged or the
+       push fails, stop and report the error for manual intervention.
+       Never use --force, -f, --force-with-lease, or automatically rebase/reset.
+    3. Reuse an existing open PR for this head/base if present; otherwise create
+       one with `gh pr create --base {{branch_base}}`, a descriptive title starting
+       with "Fixes #{{issue_id}}", and a body containing "Fixes #{{issue_id}}".
+    4. End your reply with exactly: PR_NUMBER: <positive PR number>
+
+    Do not invoke frg or nia to save context. The engine performs that next.
+    """, context = ["issue"], outputs = { pr_number = 'PR_NUMBER:\s*#?([1-9][0-9]*)' } }
+on_success = "save_pr_context"
+on_failure = "await_pr_intervention"
+
+[[workflow.states]]
+name = "save_pr_context"
+description = "Save the captured PR number through the engine"
+operation = { id = "save-pr-context", type = "config", set = { pr_id = "{{pr_number}}" } }
+on_success = "pr_draft"
+on_failure = "await_pr_intervention"
+
+[[workflow.states]]
+name = "await_pr_intervention"
+description = "Recover from PR creation or number capture failure"
+on_success = "save_pr_context_manual"
+on_failure = "pr_failed"
+
+[workflow.states.approval]
+gate_id = "pr_intervention"
+message = "Create or locate the PR manually, then approve and enter its number."
+timeout_seconds = 86400
+input = { name = "pr_number", message = "Pull request number", required = true }
+
+[[workflow.states]]
+name = "save_pr_context_manual"
+description = "Save the manually supplied PR number"
+operation = { id = "save-pr-context-manual", type = "config", set = { pr_id = "{{pr_number}}" } }
+on_success = "pr_draft"
+on_failure = "pr_failed"
+
+[[workflow.states]]
+name = "pr_draft"
+description = "Generate the lightweight PR description"
+is_exit_point = true
+operation = { target = "pr", operation = "draft", modifiers = ["lite"] }
+on_success = "pr_publish"
+on_failure = "pr_publish"
+
+[[workflow.states]]
+name = "pr_publish"
+description = "Publish the PR description"
+is_exit_point = true
+operation = { target = "pr", operation = "publish" }
+on_success = "attach_visual_evidence"
+on_failure = "attach_visual_evidence"
+
+[[workflow.states]]
+name = "attach_visual_evidence"
+description = "Append visual evidence and the verification summary"
+operation = { id = "attach-visual-evidence", type = "agent", prompt = """
+    Update PR {{pr_id}} with evidence for issue {{issue_id}}.
+    Read {{job_dir}}/visual-evidence/verification-summary.md and the available
+    before.png and after.png in the same directory. Use only demo data.
+
+    Get the current body with `gh pr view {{pr_id}} --json body -q .body` and
+    preserve its existing content. Add or update a single "Visual Verification"
+    section with Before, After, and Playwright Test Summary subsections.
+    Upload screenshots only if an authenticated, supported attachment mechanism
+    is actually available. Do not assume gh has an image-upload command, invent
+    attachment URLs, or commit screenshots merely to publish them.
+    If upload is unavailable, include the written summary, mark images as not
+    attached, and report their retained local paths. Mark absent captures as
+    "not captured". Never fabricate a verification summary or successful upload.
+
+    Write the body to a temporary file and apply with
+    `gh pr edit {{pr_id}} --body-file <PATH>`. Retain local evidence for review,
+    including on upload or update failure. Do not delete evidence automatically.
+    """, context = ["pr", "issue"], share_session_with = "playwright_verify" }
+on_success = "pr_review"
+on_failure = "pr_review"
+
+[[workflow.states]]
+name = "pr_review"
+description = "Review the published PR using the lite modifier"
+is_exit_point = true
+operation = { target = "pr", operation = "review", modifiers = ["lite"] }
+on_success = "await_completion"
+on_failure = "await_completion"
+
+[[workflow.states]]
+name = "await_completion"
+description = "Acknowledge the PR handoff"
+on_success = "completed"
+on_failure = "completed"
+
+[workflow.states.approval]
+gate_id = "completion_ack"
+message = "Quick-fix run finished. Inspect the PR, review results, and visual evidence before manual merge; screenshots may remain local if attachment was unavailable."
+timeout_seconds = 86400
+
+[workflow.terminal_states]
+success = ["completed"]
+failed = ["code_iteration_rejected", "visual_verification_failed", "pr_failed"]
+
+[[workflow.states]]
+name = "completed"
+description = "PR handed off for manual review and merge"
+is_exit_point = true
+
+[[workflow.states]]
+name = "code_iteration_rejected"
+description = "Further quick-fix code generation was rejected"
+
+[[workflow.states]]
+name = "visual_verification_failed"
+description = "Visual verification or its repair attempt failed or was rejected"
+
+[[workflow.states]]
+name = "pr_failed"
+description = "PR creation or context saving failed after intervention"
