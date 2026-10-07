@@ -11,6 +11,7 @@ export interface SchedulerAppointment {
 }
 
 export interface GridAppointment {
+  id: number;
   time: string;
   patientName: string;
   reason: string;

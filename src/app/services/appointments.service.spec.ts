@@ -28,6 +28,7 @@ describe('AppointmentsService', () => {
     if (todayItems.length > 0) {
       expect(todayItems[0]).toEqual(
         expect.objectContaining({
+          id: expect.any(Number),
           time: expect.any(String),
           patientName: expect.any(String),
           reason: expect.any(String),
@@ -36,5 +37,14 @@ describe('AppointmentsService', () => {
         }),
       );
     }
+  });
+
+  it('should include the Isabella Rossi upcoming appointment among todays appointments', () => {
+    const todayItems = service.getTodaysAppointments();
+
+    const isabellaAppointment = todayItems.find((item) => item.patientName === 'Isabella Rossi');
+
+    expect(isabellaAppointment).toBeDefined();
+    expect(isabellaAppointment?.status).toBe('Upcoming');
   });
 });
