@@ -97,7 +97,14 @@
         </button>
       </div>
 
-      <kendo-grid [data]="appointments" adaptiveMode="auto">
+      <kendo-grid
+        [data]="appointments"
+        [pinnable]="'top'"
+        [pinnedTopRows]="pinnedTopRows"
+        (rowPinChange)="onRowPinChange($event)"
+        adaptiveMode="auto"
+      >
+        <kendo-grid-rowpin-column></kendo-grid-rowpin-column>
         <kendo-grid-column field="time" title="Time" [width]="110"></kendo-grid-column>
         <kendo-grid-column
           field="patientName"

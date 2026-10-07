@@ -23,7 +23,7 @@ import {
 } from '@progress/kendo-angular-conversational-ui';
 import { KENDO_DIALOG } from '@progress/kendo-angular-dialog';
 import { KENDO_DROPDOWNS } from '@progress/kendo-angular-dropdowns';
-import { KENDO_GRID } from '@progress/kendo-angular-grid';
+import { KENDO_GRID, RowPinEvent } from '@progress/kendo-angular-grid';
 import { KENDO_ICONS } from '@progress/kendo-angular-icons';
 import { KENDO_INDICATORS } from '@progress/kendo-angular-indicators';
 import { KENDO_INPUTS } from '@progress/kendo-angular-inputs';
@@ -139,6 +139,12 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   // Appointments data
   public appointments: GridAppointment[] = [];
+
+  // Rows pinned to the top of the "Today's Appointments" grid. Pre-pinned with the
+  // upcoming appointment so it stays visible without scrolling; users can also pin/unpin
+  // additional rows via the grid's pin column.
+  public pinnedTopRows: GridAppointment[] = [];
+  private readonly upcomingAppointmentPatientName = 'Isabella Rossi';
 
   // Next Patient data
   public nextPatient: PatientProfile | null = null;
@@ -302,6 +308,9 @@ Dr. Carter`;
     this.pageHeaderService.title.set('Good morning, Dr. Carter');
     this.pageHeaderService.subtitle.set('Today is ' + this.currentDate);
     this.appointments = this.appointmentsService.getTodaysAppointments();
+    this.pinnedTopRows = this.appointments.filter(
+      (appointment) => appointment.patientName === this.upcomingAppointmentPatientName,
+    );
 
     // Set next patient to Isabella Rossi (id: 3)
     this.nextPatient = PATIENTS_DATA.find((p) => p.id === 3) || null;
@@ -314,6 +323,11 @@ Dr. Carter`;
 
   public navigateToSchedule(): void {
     this.router.navigate(['/schedule']);
+  }
+
+  // Keeps the pinned rows in sync when the user pins/unpins a row via the grid's pin column.
+  public onRowPinChange(event: RowPinEvent): void {
+    this.pinnedTopRows = event.pinnedTopRows;
   }
 
   public navigateToPatientProfile(patientId: number): void {

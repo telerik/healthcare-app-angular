@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
-import { getAppointmentsData, SchedulerAppointment, GridAppointment } from '../data/appointments.data';
+import {
+  getAppointmentsData,
+  SchedulerAppointment,
+  GridAppointment,
+} from '../data/appointments.data';
 
 export type { SchedulerAppointment, GridAppointment };
 
@@ -41,6 +45,7 @@ export class AppointmentsService {
       const status = apt.status || (apt.cancelled ? 'Cancelled' : 'Upcoming');
 
       return {
+        id: apt.id,
         time: this.formatTime(apt.start),
         patientName: apt.title,
         reason: apt.reason,
