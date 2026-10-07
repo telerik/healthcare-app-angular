@@ -1,13 +1,25 @@
 /* You can add global styles to this file, and also import other style files */
 
+:root {
+  /*
+   * Solid, WCAG 2.2 AA compliant page background (replaces the previous pastel
+   * `assets/bg.svg` wash, which was nearly indistinguishable from white content
+   * surfaces). This muted blue-violet tone keeps the healthcare dashboard's
+   * existing brand hue (see the `#5b5fc7` accent used elsewhere) while meeting
+   * both:
+   *  - >= 3:1 contrast against #ffffff cards/app bar (WCAG 1.4.11 non-text contrast), and
+   *  - >= 4.5:1 contrast for the dark page-title/subtitle text rendered directly on it.
+   * Shared with `.sticky-header-wrapper` in `app.css` so the body and the
+   * sticky header stay visually consistent.
+   */
+  --app-page-background: #868fb9;
+}
+
 body {
   margin: 0;
   padding-top: 0;
   font-family: 'Poppins', sans-serif;
-  background-image: url('assets/bg.svg');
-  background-repeat: no-repeat;
-  background-position: center top;
-  background-size: cover;
+  background-color: var(--app-page-background);
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;

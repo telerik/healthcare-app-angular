@@ -36,11 +36,11 @@
   top: 0;
   z-index: 1000;
   padding-top: 40px;
-  background-color: #fafafa;
-  background-image: url('../assets/bg.svg');
-  background-repeat: no-repeat;
-  background-position: center top;
-  background-size: auto;
+  /* Same solid, WCAG 2.2 AA compliant color as the page body (see styles.css)
+     so the sticky header stays visually consistent with the rest of the page
+     while scrolling, instead of the previous low-contrast `#fafafa` + pastel
+     `bg.svg` wash. */
+  background-color: var(--app-page-background, #868fb9);
   padding-bottom: 16px;
 }
 
